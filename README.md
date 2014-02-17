@@ -13,7 +13,7 @@ go get github.com/fatih/color
 
 ## Examples
 
-# Standard colors
+### Standard colors
 
 ```go
 // Print with default foreground colors
@@ -25,34 +25,33 @@ color.Green.Add(color.Bold).Println("Green with bold")
 color.Red.Add(color.BgWhite, color.Underline).Printf("Red with Black background and underscore: %s\n", "format too!")
 ```
 
-# Custom colors
+### Custom colors
 
 ```go
 // Create and reuse color objects
 c := color.Cyan.Add(color.Underline)
-c.Println("Prints bold cyan.")
+c.Println("Prints cyan text with an underline.")
 c.Printf("Thir prints bold cyan %s\n", "too!.")
 
-
 // Create custom color objects:
-c := color.New(color.FgGreen, color.BgCyan, color.Italic)
-c.Print("Italic green with cyan backround")
+d := color.New(color.FgWhite, color.BgGreen)
+d.Println("White with green backround")
 ```
 
-# Plug into your existing code
+### Plug into your existing code
 
 ```go
 // Use handy standard colors.
-color.Yello.Set()
-fmt.Println("Existing text in your codebase will be now in Cyan")
+color.Yellow.Set()
+fmt.Println("Existing text in your codebase will be now in Yellow")
 fmt.Printf("This one %s\n", "too")
 color.Unset() // don't forget to unset
 
-// You can use set custom objects too
-color.New(color.FgBlack, color.BgWhite, color.Bold).Set()
+// You can set custom objects too
+color.New(color.FgMagenta, color.Bold).Set()
 defer color.Unset() // use it in your function
 
-fmt.Println("All text will be now bold red with white background.")
+fmt.Println("All text will be now bold magenta.")
 ```
 
 ## Credits

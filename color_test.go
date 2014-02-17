@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// The example from the standart library doesn't work unfortunaly.
 func TestColor(t *testing.T) {
 	Cyan.Print("Prints text in cyan.")
 	Blue.Print("Prints text in blue.")
@@ -15,21 +16,21 @@ func TestColor(t *testing.T) {
 
 	// Create and reuse color objects
 	c := Cyan.Add(Underline)
-	c.Println("Prints bold cyan.")
+	c.Println("Prints cyan text with an underline.")
 	c.Printf("Thir prints bold cyan %s\n", "too!.")
 
 	// Create custom color objects:
-	d := New(FgGreen, BgCyan, Italic)
-	d.Print("Italic green with cyan backround")
+	d := New(FgWhite, BgGreen)
+	d.Println("White with green backround")
 
 	// You can use set custom objects too
-	Cyan.Set()
-	fmt.Println("Existing text in your codebase will be now in Cyan")
+	Yellow.Set()
+	fmt.Println("Existing text in your codebase will be now in Yellow")
 	fmt.Printf("This one %s\n", "too")
 	Unset() // don't forget to unset
 
 	// You can use set custom objects too
-	New(FgBlack, BgWhite, Bold).Set()
+	New(FgMagenta, Bold).Set()
 	defer Unset() // use it in your function
 
 	fmt.Println("All text will be now bold red with white background.")
