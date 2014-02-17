@@ -1,31 +1,37 @@
 package color
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"time"
-
 	"testing"
 )
 
 func TestColor(t *testing.T) {
-	go func() {
-		scanner := bufio.NewScanner(os.Stdout)
-		for scanner.Scan() {
-			fmt.Println(scanner.Text()) // Println will add back the final '\n'
-		}
-	}()
+	Cyan.Print("Prints text in cyan.")
+	Blue.Print("Prints text in blue.")
 
-	time.Sleep(time.Millisecond * 300)
+	// Chain SGR paramaters
+	Green.Add(Bold).Println("Green with bold")
+	Red.Add(BgWhite, Underline).Printf("Red with White background and underscore: %s\n", "format too!")
 
-	c := Cyan.Bold()
-	c.Println("ankara")
+	// Create and reuse color objects
+	c := Cyan.Add(Underline)
+	c.Println("Prints bold cyan.")
+	c.Printf("Thir prints bold cyan %s\n", "too!.")
 
-	// New(FgGreen, Bold).Begin()
-	// fmt.Println("san francisco")
-	// End()
+	// Create custom color objects:
+	d := New(FgGreen, BgCyan, Italic)
+	d.Print("Italic green with cyan backround")
 
-	// Output:
-	// ankara
+	// You can use set custom objects too
+	Cyan.Set()
+	fmt.Println("Existing text in your codebase will be now in Cyan")
+	fmt.Printf("This one %s\n", "too")
+	Unset() // don't forget to unset
+
+	// You can use set custom objects too
+	New(FgBlack, BgWhite, Bold).Set()
+	defer Unset() // use it in your function
+
+	fmt.Println("All text will be now bold red with white background.")
+
 }
