@@ -22,7 +22,7 @@ color.Blue.Print("Prints text in blue.")
 
 // Chain SGR paramaters
 color.Green.Add(color.Bold).Println("Green with bold")
-color.Red.Add(color.BgWhite, color.Underline).Printf("Red with Black background and underscore: %s\n", "format too!")
+color.Red.Add(color.BgWhite, color.Underline).Println("Red with Black background and underscore")
 ```
 
 ### Custom colors

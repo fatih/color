@@ -7,17 +7,36 @@ import (
 
 // The example from the standart library doesn't work unfortunaly.
 func TestColor(t *testing.T) {
-	Cyan.Print("Prints text in cyan.")
-	Blue.Print("Prints text in blue.")
+	fmt.Printf("black")
+	New(BgBlack).Println("         ")
+	fmt.Printf("red\t")
+	New(BgRed).Println("         ")
+	fmt.Printf("green\t")
+	New(BgGreen).Println("         ")
+	fmt.Printf("yellow\t")
+	New(BgYellow).Println("         ")
+	fmt.Printf("blue\t")
+	New(BgBlue).Println("         ")
+	fmt.Printf("magenta\t")
+	New(BgMagenta).Println("         ")
+	fmt.Printf("cyan\t")
+	New(BgCyan).Println("         ")
+	fmt.Printf("white\t")
+	New(BgWhite).Println("         ")
+
+	fmt.Println("")
+
+	Cyan.Print("Prints text in cyan. ")
+	Blue.Print("Prints text in blue. ")
 
 	// Chain SGR paramaters
 	Green.Add(Bold).Println("Green with bold")
-	Red.Add(BgWhite, Underline).Printf("Red with White background and underscore: %s\n", "format too!")
+	Red.Add(BgWhite, Underline).Println("Red with White background and underscore")
 
 	// Create and reuse color objects
-	c := Cyan.Add(Underline)
+	c := Red.Add(Underline)
+	fmt.Println(c.params)
 	c.Println("Prints cyan text with an underline.")
-	c.Printf("Thir prints bold cyan %s\n", "too!.")
 
 	// Create custom color objects:
 	d := New(FgWhite, BgGreen)
