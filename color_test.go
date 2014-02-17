@@ -7,22 +7,34 @@ import (
 
 // The example from the standart library doesn't work unfortunaly.
 func TestColor(t *testing.T) {
-	fmt.Printf("black")
-	New(BgBlack).Println("         ")
-	fmt.Printf("red\t")
-	New(BgRed).Println("         ")
-	fmt.Printf("green\t")
-	New(BgGreen).Println("         ")
-	fmt.Printf("yellow\t")
-	New(BgYellow).Println("         ")
-	fmt.Printf("blue\t")
-	New(BgBlue).Println("         ")
-	fmt.Printf("magenta\t")
-	New(BgMagenta).Println("         ")
-	fmt.Printf("cyan\t")
-	New(BgCyan).Println("         ")
-	fmt.Printf("white\t")
-	New(BgWhite).Println("         ")
+
+	New(FgRed).Printf("red\t")
+	New(BgRed).Print("         ")
+	New(FgRed, Bold).Println(" red")
+
+	New(FgGreen).Printf("green\t")
+	New(BgGreen).Print("         ")
+	New(FgGreen, Bold).Println(" green")
+
+	New(FgYellow).Printf("yellow\t")
+	New(BgYellow).Print("         ")
+	New(FgYellow, Bold).Println(" yellow")
+
+	New(FgBlue).Printf("blue\t")
+	New(BgBlue).Print("         ")
+	New(FgBlue, Bold).Println(" blue")
+
+	New(FgMagenta).Printf("magenta\t")
+	New(BgMagenta).Print("         ")
+	New(FgMagenta, Bold).Println(" magenta")
+
+	New(FgCyan).Printf("cyan\t")
+	New(BgCyan).Print("         ")
+	New(FgCyan, Bold).Println(" cyan")
+
+	New(FgWhite).Printf("white\t")
+	New(BgWhite).Print("         ")
+	New(FgWhite, Bold).Println(" white")
 
 	fmt.Println("")
 
@@ -34,9 +46,8 @@ func TestColor(t *testing.T) {
 	Red.Add(BgWhite, Underline).Println("Red with White background and underscore")
 
 	// Create and reuse color objects
-	c := Red.Add(Underline)
-	fmt.Println(c.params)
-	c.Println("Prints cyan text with an underline.")
+	c := New(FgRed).Add(Underline)
+	c.Println("Prints red text with an underline.")
 
 	// Create custom color objects:
 	d := New(FgWhite, BgGreen)
@@ -52,6 +63,6 @@ func TestColor(t *testing.T) {
 	New(FgMagenta, Bold).Set()
 	defer Unset() // use it in your function
 
-	fmt.Println("All text will be now bold red with white background.")
+	fmt.Println("All text will be now bold magenta.")
 
 }
