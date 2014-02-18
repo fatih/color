@@ -10,17 +10,17 @@ import (
 
 // Color defines a custom color object which is defined by SGR parameters.
 type Color struct {
-	params []Parameter
+	params []Attribute
 }
 
-// Parameter defines a single SGR Code
-type Parameter int
+// Attribute defines a single SGR Code
+type Attribute int
 
 const escape = "\x1b"
 
-// Base paramaters
+// Base attributes
 const (
-	Reset Parameter = iota
+	Reset Attribute = iota
 	Bold
 	Faint
 	Italic
@@ -34,7 +34,7 @@ const (
 
 // Foreground text colors
 const (
-	FgBlack Parameter = iota + 30
+	FgBlack Attribute = iota + 30
 	FgRed
 	FgGreen
 	FgYellow
@@ -46,7 +46,7 @@ const (
 
 // Background text colors
 const (
-	BgBlack Parameter = iota + 40
+	BgBlack Attribute = iota + 40
 	BgRed
 	BgGreen
 	BgYellow
@@ -57,34 +57,34 @@ const (
 )
 
 // New returns a newly created color object.
-func New(value ...Parameter) *Color {
-	c := &Color{params: make([]Parameter, 0)}
+func New(value ...Attribute) *Color {
+	c := &Color{params: make([]Attribute, 0)}
 	c.Add(value...)
 	return c
 }
 
 // Set sets the given parameters immediately. It will change the color of
 // output with the given SGR parameters until color.Unset() is called.
-func Set(p ...Parameter) *Color {
+func Set(p ...Attribute) *Color {
 	c := New(p...)
 	c.Set()
 	return c
 }
 
-// Unset resets all escape attributes and clears the output. Usualy should
+// Unset resets all escape attributes and clears the output. Usually should
 // be called after Set().
 func Unset() {
 	fmt.Fprintf(Output, "%s[%dm", escape, Reset)
 }
 
-// Add is used to chain SGR parameters. Use as many as paramters to combine
+// Add is used to chain SGR parameters. Use as many as parameters to combine
 // and create custom color objects. Example: Add(color.FgRed, color.Underline).
-func (c *Color) Add(value ...Parameter) *Color {
+func (c *Color) Add(value ...Attribute) *Color {
 	c.params = append(c.params, value...)
 	return c
 }
 
-func (c *Color) prepend(value Parameter) {
+func (c *Color) prepend(value Attribute) {
 	c.params = append(c.params, 0)
 	copy(c.params[1:], c.params[0:])
 	c.params[0] = value
@@ -93,16 +93,6 @@ func (c *Color) prepend(value Parameter) {
 // Output defines the standard output of the print functions. By default
 // os.Stdout is used.
 var Output io.Writer = os.Stdout
-
-// Printf formats according to a format specifier and writes to standard output.
-// It returns the number of bytes written and any write error encountered.
-// This is the standard fmt.Printf() method wrapped with the given color.
-func (c *Color) Printf(format string, a ...interface{}) (n int, err error) {
-	c.Set()
-	defer Unset()
-
-	return fmt.Fprintf(Output, format, a...)
-}
 
 // Print formats using the default formats for its operands and writes to
 // standard output. Spaces are added between operands when neither is a
@@ -114,6 +104,16 @@ func (c *Color) Print(a ...interface{}) (n int, err error) {
 	defer Unset()
 
 	return fmt.Fprint(Output, a...)
+}
+
+// Printf formats according to a format specifier and writes to standard output.
+// It returns the number of bytes written and any write error encountered.
+// This is the standard fmt.Printf() method wrapped with the given color.
+func (c *Color) Printf(format string, a ...interface{}) (n int, err error) {
+	c.Set()
+	defer Unset()
+
+	return fmt.Fprintf(Output, format, a...)
 }
 
 // Println formats using the default formats for its operands and writes to
@@ -157,7 +157,7 @@ func Red(format string, a ...interface{}) { printColor(format, FgRed, a...) }
 // newline is appended to format by default.
 func Green(format string, a ...interface{}) { printColor(format, FgGreen, a...) }
 
-// Yellow is an convenient helper function to print with yello foreground.
+// Yellow is an convenient helper function to print with yellow foreground.
 // A newline is appended to format by default.
 func Yellow(format string, a ...interface{}) { printColor(format, FgYellow, a...) }
 
@@ -177,11 +177,11 @@ func Cyan(format string, a ...interface{}) { printColor(format, FgCyan, a...) }
 // newline is appended to format by default.
 func White(format string, a ...interface{}) { printColor(format, FgWhite, a...) }
 
-func printColor(format string, p Parameter, a ...interface{}) {
+func printColor(format string, p Attribute, a ...interface{}) {
 	if !strings.HasSuffix(format, "\n") {
 		format += "\n"
 	}
 
-	c := &Color{params: []Parameter{p}}
+	c := &Color{params: []Attribute{p}}
 	c.Printf(format, a...)
 }

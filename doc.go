@@ -1,14 +1,14 @@
 /*
 Package color is an ANSI color package to output colorized or SGR defined
 output to the standard output. The api can be used in several way, pick one
-one that suits you.
+that suits you.
 
 Use simple and default helper functions with predefined foreground colors:
 
     color.Cyan("Prints text in cyan.")
     color.Blue("Prints %s in blue.", "text") // a newline will be appended automatically
 
-    // These are using by default foreground colors.
+    // More default foreground colors..
     color.Red("We have red")
     color.Yellow("Yellow color too!")
     color.Magenta("And many others ..")
@@ -16,7 +16,7 @@ Use simple and default helper functions with predefined foreground colors:
 
 However there are times where custom color mixes are required. Below are some
 examples to create custom color objects and use the print functions of each
-seperate color object.
+separate color object.
 
     // Create a new color object
     c := color.New(color.FgCyan).Add(color.Underline)
@@ -38,13 +38,15 @@ seperate color object.
 
 
 Using with existing color is possible too. Just use the Set() method to set
-the standart output to the given parameters. That way a rewrite of an existing
+the standard output to the given parameters. That way a rewrite of an existing
 code is not required.
 
     // Use handy standard colors.
-    color.Set(collor.FgYellow)
-    fmt.Println("Existing text in your codebase will be now in Yellow")
+    color.Set(color.FgYellow)
+
+    fmt.Println("Existing text will be now in Yellow")
     fmt.Printf("This one %s\n", "too")
+
     color.Unset() // don't forget to unset
 
     // You can mix up parameters
@@ -53,5 +55,4 @@ code is not required.
 
     fmt.Println("All text will be now bold magenta.")
 */
-
 package color
