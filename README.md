@@ -34,8 +34,8 @@ color.Magenta("And many others ..")
 c := color.New(color.FgCyan).Add(color.Underline)
 c.Println("Prints cyan text with an underline.")
 
-// Another one
-d := color.New(color.FgCyan).Add(color.Bold)
+// Or just add them to New()
+d := color.New(color.FgCyan, color.Bold)
 d.Printf("This prints bold cyan %s\n", "too!.")
 
 

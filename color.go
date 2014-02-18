@@ -1,14 +1,11 @@
-// Package color is an ANSI color package to output colorized or SGR defined
-// output to the standard output.
 package color
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"strconv"
 	"strings"
-
-	"fmt"
 )
 
 // Color defines a custom color object which is defined by SGR parameters.
@@ -21,7 +18,7 @@ type Parameter int
 
 const escape = "\x1b"
 
-// All attributes off
+// Base paramaters
 const (
 	Reset Parameter = iota
 	Bold
