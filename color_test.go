@@ -75,5 +75,13 @@ func TestColor(t *testing.T) {
 
 	// Second Visual test
 
+	Black("black")
 	Red("red")
+	Green("green")
+	Yellow("yellow")
+	Blue("blue")
+	Magenta("magenta")
+	Cyan("cyan")
+	White("white")
+
 }

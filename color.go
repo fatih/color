@@ -55,23 +55,44 @@ const (
 	BgWhite
 )
 
-var (
-	Black   = &Color{params: []Parameter{FgBlack}}
-	Green   = &Color{params: []Parameter{FgGreen}}
-	Yellow  = &Color{params: []Parameter{FgYellow}}
-	Blue    = &Color{params: []Parameter{FgBlue}}
-	Magenta = &Color{params: []Parameter{FgMagenta}}
-	Cyan    = &Color{params: []Parameter{FgCyan}}
-	White   = &Color{params: []Parameter{FgWhite}}
-)
+// Black is an convenient helper function to print with black foreground. A
+// newline is appended to format by default.
+func Black(format string, a ...interface{}) { printColor(format, FgBlack, a...) }
 
-// Red is an convenient helper function to print with red foreground.
-func Red(format string, a ...interface{}) {
+// Red is an convenient helper function to print with red foreground. A
+// newline is appended to format by default.
+func Red(format string, a ...interface{}) { printColor(format, FgRed, a...) }
+
+// Green is an convenient helper function to print with green foreground. A
+// newline is appended to format by default.
+func Green(format string, a ...interface{}) { printColor(format, FgGreen, a...) }
+
+// Yellow is an convenient helper function to print with yello foreground.
+// A newline is appended to format by default.
+func Yellow(format string, a ...interface{}) { printColor(format, FgYellow, a...) }
+
+// Blue is an convenient helper function to print with blue foreground. A
+// newline is appended to format by default.
+func Blue(format string, a ...interface{}) { printColor(format, FgBlue, a...) }
+
+// Magenta is an convenient helper function to print with magenta foreground.
+// A newline is appended to format by default.
+func Magenta(format string, a ...interface{}) { printColor(format, FgMagenta, a...) }
+
+// Cyan is an convenient helper function to print with cyan foreground. A
+// newline is appended to format by default.
+func Cyan(format string, a ...interface{}) { printColor(format, FgCyan, a...) }
+
+// White is an convenient helper function to print with white foreground. A
+// newline is appended to format by default.
+func White(format string, a ...interface{}) { printColor(format, FgWhite, a...) }
+
+func printColor(format string, p Parameter, a ...interface{}) {
 	if !strings.HasSuffix(format, "\n") {
 		format += "\n"
 	}
 
-	c := &Color{params: []Parameter{FgRed}}
+	c := &Color{params: []Parameter{p}}
 	c.Printf(format, a...)
 }
 
