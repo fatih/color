@@ -1,6 +1,8 @@
 package color
 
 import (
+	"io"
+	"os"
 	"strconv"
 	"strings"
 
@@ -13,6 +15,8 @@ type Color struct {
 
 // Parameter defines a single SGR Code
 type Parameter int
+
+const escape = "\x1b"
 
 const (
 	FgBlack Parameter = iota + 30
@@ -82,13 +86,17 @@ func (c *Color) prepend(value Parameter) {
 	c.params[0] = value
 }
 
+// Output defines the standard output of the print functions. Any io.Writer
+// can be used.
+var Output io.Writer = os.Stdout
+
 // Printf formats according to a format specifier and writes to standard output.
 // It returns the number of bytes written and any write error encountered.
 func (c *Color) Printf(format string, a ...interface{}) (n int, err error) {
 	c.Set()
 	defer Unset()
 
-	return fmt.Printf(format, a...)
+	return fmt.Fprintf(Output, format, a...)
 }
 
 // Print formats using the default formats for its operands and writes to
@@ -99,7 +107,7 @@ func (c *Color) Print(a ...interface{}) (n int, err error) {
 	c.Set()
 	defer Unset()
 
-	return fmt.Print(a...)
+	return fmt.Fprint(Output, a...)
 }
 
 // Println formats using the default formats for its operands and writes to
@@ -110,7 +118,7 @@ func (c *Color) Println(a ...interface{}) (n int, err error) {
 	c.Set()
 	defer Unset()
 
-	return fmt.Println(a...)
+	return fmt.Fprintln(Output, a...)
 }
 
 // sequence returns a formated SGR sequence to be plugged into a "\033[...m"
@@ -126,9 +134,10 @@ func (c *Color) sequence() string {
 
 // Set sets the SGR sequence.
 func (c *Color) Set() {
-	fmt.Printf("\033[%sm", c.sequence())
+	fmt.Fprintf(Output, "%s[%sm", escape, c.sequence())
 }
 
+// Unset() resets all escape attributes.
 func Unset() {
-	fmt.Print("\033[0m")
+	fmt.Fprintf(Output, "%s[%dm", escape, Reset)
 }
