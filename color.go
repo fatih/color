@@ -128,6 +128,32 @@ func (c *Color) Println(a ...interface{}) (n int, err error) {
 	return fmt.Fprintln(Output, a...)
 }
 
+func (c *Color) Sprintln() func(a ...interface{}) string {
+	return func(a ...interface{}) string {
+		c.Set()
+		defer Unset()
+		return fmt.Sprintln(a...)
+	}
+}
+
+// PrintFunc returns a new function prints the passed arguments as colorized
+// with color.Print().
+func (c *Color) PrintFunc() func(a ...interface{}) {
+	return func(a ...interface{}) { c.Print(a...) }
+}
+
+// PrintfFunc returns a new function prints the passed arguments as colorized
+// with color.Printf().
+func (c *Color) PrintfFunc() func(format string, a ...interface{}) {
+	return func(format string, a ...interface{}) { c.Printf(format, a...) }
+}
+
+// PrintlnFunc returns a new function prints the passed arguments as colorized
+// with color.Println().
+func (c *Color) PrintlnFunc() func(a ...interface{}) {
+	return func(a ...interface{}) { c.Println(a...) }
+}
+
 // sequence returns a formated SGR sequence to be plugged into a "\x1b[...m"
 // an example output might be: "1;36" -> bold cyan
 func (c *Color) sequence() string {

@@ -39,6 +39,18 @@ separate color object.
     whiteBackground.Println("Red text with White background.")
 
 
+You can create PrintXxx functions to simplify even more:
+
+    // Create a custom print function for convenient
+    red := color.New(color.FgRed).PrintfFunc()
+    red("warning")
+    red("error: %s", err)
+
+    // Mix up multiple attributes
+    notice := color.New(color.Bold, color.FgGreen).PrintlnFunc()
+    notice("don't forget this...")
+
+
 Using with existing color is possible too. Just use the Set() method to set
 the standard output to the given parameters. That way a rewrite of an existing
 code is not required.

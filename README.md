@@ -4,6 +4,7 @@ Color let you use colorized outputs in terms of [ANSI Escape
 Codes](http://en.wikipedia.org/wiki/ANSI_escape_code#Colors). The API can be
 used in several way, pick one one that suits you.
 
+The package is under ongoing development, checkout for regular updates.
 
 ## Install
 
@@ -51,6 +52,19 @@ whiteBackground := red.Add(color.BgWhite)
 whiteBackground.Println("Red text with White background.")
 ```
 
+### Custom print functions
+
+```go
+// Create a custom print function for convenient
+red := color.New(color.FgRed).PrintfFunc()
+red("warning")
+red("error: %s", err)
+
+// Mix up multiple attributes
+notice := color.New(color.Bold, color.FgGreen).PrintlnFunc()
+notice("don't forget this...")
+```
+
 ### Plug into existing code
 
 ```go
@@ -71,8 +85,8 @@ fmt.Println("All text will be now bold magenta.")
 
 ## Todo
 
-* Add partial coloring of lines.
-* Save/Return previous values 
+* Save/Return previous values
+* Implement SprintXxx functions()
 
 ## Credits
 
