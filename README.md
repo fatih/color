@@ -1,4 +1,4 @@
-# Color [![GoDoc](https://godoc.org/github.com/fatih/color?status.png)](http://godoc.org/github.com/fatih/color)
+# Color [![GoDoc](https://godoc.org/github.com/fatih/color?status.png)](http://godoc.org/github.com/fatih/color) [![Build Status](https://travis-ci.org/fatih/color.png)](https://travis-ci.org/fatih/color)
 
 Color let you use colorized outputs in terms of [ASCI Escape
 Codes](http://en.wikipedia.org/wiki/ANSI_escape_code#Colors). The API can be
