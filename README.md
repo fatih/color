@@ -38,7 +38,7 @@ d := color.New(color.FgWhite, color.BgGreen)
 d.Println("White with green backround")
 ```
 
-### Plug into your existing code
+### Plug into existing code
 
 ```go
 // Use handy standard colors.

@@ -7,7 +7,6 @@ import (
 	"testing"
 )
 
-// The example from the standart library doesn't work unfortunaly.
 func TestColor(t *testing.T) {
 	rb := new(bytes.Buffer)
 	Output = rb
@@ -73,4 +72,8 @@ func TestColor(t *testing.T) {
 	New(BgWhite).Print("         ")
 	New(FgWhite, Bold).Println(" white")
 	fmt.Println("")
+
+	// Second Visual test
+
+	Red("red")
 }
