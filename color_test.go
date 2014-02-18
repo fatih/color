@@ -16,7 +16,7 @@ func TestColor(t *testing.T) {
 
 	testColors := []struct {
 		text string
-		code Parameter
+		code Attribute
 	}{
 		{text: "black", code: FgBlack},
 		{text: "red", code: FgRed},
