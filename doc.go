@@ -15,7 +15,6 @@ Use simple and default helper functions with predefined foreground colors:
     color.Yellow("Yellow color too!")
     color.Magenta("And many others ..")
 
-
 However there are times where custom color mixes are required. Below are some
 examples to create custom color objects and use the print functions of each
 separate color object.
@@ -51,8 +50,19 @@ You can create PrintXxx functions to simplify even more:
     notice("don't forget this...")
 
 
-Using with existing color is possible too. Just use the Set() method to set
-the standard output to the given parameters. That way a rewrite of an existing
+Or create SprintXxx functions to mix strings with other non-colorized strings:
+
+    yellow := New(FgYellow).SprintFunc()
+    red := New(FgRed).SprintFunc()
+
+    fmt.Printf("this is a %s and this is %s.\n", yellow("warning"), red("error"))
+
+    info := New(FgWhite, BgGreen).SprintFunc()
+    fmt.Printf("this %s rocks!\n", info("package"))
+
+
+Using with existing code is possible. Just use the Set() method to set the
+standard output to the given parameters. That way a rewrite of an existing
 code is not required.
 
     // Use handy standard colors.

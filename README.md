@@ -65,6 +65,18 @@ notice := color.New(color.Bold, color.FgGreen).PrintlnFunc()
 notice("don't forget this...")
 ```
 
+### Insert into noncolor strings
+
+```go
+// Create SprintXxx functions to mix strings with other non-colorized strings:
+yellow := New(FgYellow).SprintFunc()
+red := New(FgRed).SprintFunc()
+fmt.Printf("this is a %s and this is %s.\n", yellow("warning"), red("error"))
+
+info := New(FgWhite, BgGreen).SprintFunc()
+fmt.Printf("this %s rocks!\n", info("package"))
+```
+
 ### Plug into existing code
 
 ```go
