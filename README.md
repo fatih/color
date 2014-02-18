@@ -98,6 +98,9 @@ fmt.Println("All text will be now bold magenta.")
 ## Todo
 
 * Save/Return previous values
+* Add Windows support
+* Evaluate fmt.Formatter interface
+
 
 ## Credits
 
