@@ -1,12 +1,14 @@
 /*
 Package color is an ANSI color package to output colorized or SGR defined
-output to the standard output. The api can be used in several way, pick one
+output to the standard output. The API can be used in several way, pick one
 that suits you.
 
 Use simple and default helper functions with predefined foreground colors:
 
     color.Cyan("Prints text in cyan.")
-    color.Blue("Prints %s in blue.", "text") // a newline will be appended automatically
+
+    // a newline will be appended automatically
+    color.Blue("Prints %s in blue.", "text")
 
     // More default foreground colors..
     color.Red("We have red")
