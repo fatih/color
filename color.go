@@ -128,30 +128,49 @@ func (c *Color) Println(a ...interface{}) (n int, err error) {
 	return fmt.Fprintln(Output, a...)
 }
 
-func (c *Color) Sprintln() func(a ...interface{}) string {
-	return func(a ...interface{}) string {
-		c.Set()
-		defer Unset()
-		return fmt.Sprintln(a...)
-	}
-}
-
-// PrintFunc returns a new function prints the passed arguments as colorized
-// with color.Print().
+// PrintFunc returns a new function that prints the passed arguments as
+// colorized with color.Print().
 func (c *Color) PrintFunc() func(a ...interface{}) {
 	return func(a ...interface{}) { c.Print(a...) }
 }
 
-// PrintfFunc returns a new function prints the passed arguments as colorized
-// with color.Printf().
+// PrintfFunc returns a new function that prints the passed arguments as
+// colorized with color.Printf().
 func (c *Color) PrintfFunc() func(format string, a ...interface{}) {
 	return func(format string, a ...interface{}) { c.Printf(format, a...) }
 }
 
-// PrintlnFunc returns a new function prints the passed arguments as colorized
-// with color.Println().
+// PrintlnFunc returns a new function that prints the passed arguments as
+// colorized with color.Println().
 func (c *Color) PrintlnFunc() func(a ...interface{}) {
 	return func(a ...interface{}) { c.Println(a...) }
+}
+
+// SprintFunc returns a new function that returns colorized strings for the
+// given arguments with fmt.Sprint(). Useful to put into or mix into other
+// string.
+func (c *Color) SprintFunc() func(a ...interface{}) string {
+	return func(a ...interface{}) string {
+		return c.wrap(fmt.Sprint(a...))
+	}
+}
+
+// SprintfFunc returns a new function that returns colorized strings for the
+// given arguments with fmt.Sprintf(). Useful to put into or mix into other
+// string.
+func (c *Color) SprintfFunc() func(format string, a ...interface{}) string {
+	return func(format string, a ...interface{}) string {
+		return c.wrap(fmt.Sprintf(format, a...))
+	}
+}
+
+// SprintlnFunc returns a new function that returns colorized strings for the
+// given arguments with fmt.Sprintln(). Useful to put into or mix into other
+// string.
+func (c *Color) SprintlnFunc() func(a ...interface{}) string {
+	return func(a ...interface{}) string {
+		return c.wrap(fmt.Sprintln(a...))
+	}
 }
 
 // sequence returns a formated SGR sequence to be plugged into a "\x1b[...m"
@@ -165,9 +184,15 @@ func (c *Color) sequence() string {
 	return strings.Join(format, ";")
 }
 
+func (c *Color) wrap(s string) string { return c.format() + s + c.unformat() }
+
+func (c *Color) format() string { return fmt.Sprintf("%s[%sm", escape, c.sequence()) }
+
+func (c *Color) unformat() string { return fmt.Sprintf("%s[%dm", escape, Reset) }
+
 // Set sets the SGR sequence.
 func (c *Color) Set() *Color {
-	fmt.Fprintf(Output, "%s[%sm", escape, c.sequence())
+	fmt.Fprintf(Output, c.format())
 	return c
 }
 

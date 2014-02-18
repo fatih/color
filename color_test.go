@@ -104,4 +104,12 @@ func TestColor(t *testing.T) {
 	red := New(FgRed).PrintfFunc()
 	red("red text with a printf func: %d\n", 123)
 
+	put := New(FgYellow).SprintFunc()
+	warn := New(FgRed).SprintFunc()
+
+	fmt.Printf("this is a %s and this is %s. Aborting\n", put("warning"), warn("error"))
+
+	info := New(FgWhite, BgGreen).SprintFunc()
+	fmt.Printf("this %s rocks!\n", info("package"))
+
 }

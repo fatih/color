@@ -86,7 +86,6 @@ fmt.Println("All text will be now bold magenta.")
 ## Todo
 
 * Save/Return previous values
-* Implement SprintXxx functions()
 
 ## Credits
 
