@@ -69,6 +69,11 @@ defer color.Unset() // use it in your function
 fmt.Println("All text will be now bold magenta.")
 ```
 
+## Todo
+
+* Add partial coloring of lines.
+* Save/Return previous values 
+
 ## Credits
 
  * [Fatih Arslan](https://github.com/fatih)
