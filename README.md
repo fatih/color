@@ -16,9 +16,9 @@ go get github.com/fatih/color
 ### Standard colors
 
 ```go
-// Print with default foreground colors
-color.Cyan.Print("Prints text in cyan.")
-color.Blue.Print("Prints text in blue.")
+// Print with default helper functions
+color.Cyan("Prints text in cyan.")
+color.Blue("Prints %s in blue.", "text") // a newline will be appended automatically
 
 // Chain SGR paramaters
 color.Green.Add(color.Bold).Println("Green with bold")

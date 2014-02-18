@@ -103,11 +103,6 @@ func New(value ...Parameter) *Color {
 	return c
 }
 
-func (c *Color) Bold() *Color {
-	c.Add(Bold)
-	return c
-}
-
 // Add is used to chain SGR parameters. Use as many as paramters to combine
 // and create custom color objects. Example: Add(color.FgRed, color.Underline)
 func (c *Color) Add(value ...Parameter) *Color {
@@ -121,12 +116,13 @@ func (c *Color) prepend(value Parameter) {
 	c.params[0] = value
 }
 
-// Output defines the standard output of the print functions. Any io.Writer
-// can be used.
+// Output defines the standard output of the print functions. By default
+// os.Stdout is used.
 var Output io.Writer = os.Stdout
 
 // Printf formats according to a format specifier and writes to standard output.
 // It returns the number of bytes written and any write error encountered.
+// This is the standard fmt.Printf() method wrapped with the given color.
 func (c *Color) Printf(format string, a ...interface{}) (n int, err error) {
 	c.Set()
 	defer Unset()
@@ -137,7 +133,8 @@ func (c *Color) Printf(format string, a ...interface{}) (n int, err error) {
 // Print formats using the default formats for its operands and writes to
 // standard output. Spaces are added between operands when neither is a
 // string. It returns the number of bytes written and any write error
-// encountered.
+// encountered. This is the standard fmt.Print() method wrapped with the given
+// color.
 func (c *Color) Print(a ...interface{}) (n int, err error) {
 	c.Set()
 	defer Unset()
@@ -148,7 +145,8 @@ func (c *Color) Print(a ...interface{}) (n int, err error) {
 // Println formats using the default formats for its operands and writes to
 // standard output. Spaces are always added between operands and a newline is
 // appended. It returns the number of bytes written and any write error
-// encountered.
+// encountered. This is the standard fmt.Print() method wrapped with the given
+// color.
 func (c *Color) Println(a ...interface{}) (n int, err error) {
 	c.Set()
 	defer Unset()
