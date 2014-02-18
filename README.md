@@ -20,35 +20,46 @@ go get github.com/fatih/color
 color.Cyan("Prints text in cyan.")
 color.Blue("Prints %s in blue.", "text") // a newline will be appended automatically
 
-// Chain SGR paramaters
-color.Green.Add(color.Bold).Println("Green with bold")
-color.Red.Add(color.BgWhite, color.Underline).Println("Red with Black background and underscore")
+// These are using by default foreground colors.
+color.Red("We have red")
+color.Yellow("Yellow color too!")
+color.Magenta("And many others ..")
+
 ```
 
-### Custom colors
+### Mix and reuse colors
 
 ```go
-// Create and reuse color objects
-c := color.Cyan.Add(color.Underline)
+// Create a new color object
+c := color.New(color.FgCyan).Add(color.Underline)
 c.Println("Prints cyan text with an underline.")
-c.Printf("Thir prints bold cyan %s\n", "too!.")
 
-// Create custom color objects:
-d := color.New(color.FgWhite, color.BgGreen)
-d.Println("White with green backround")
+// Another one
+d := color.New(color.FgCyan).Add(color.Bold)
+d.Printf("This prints bold cyan %s\n", "too!.")
+
+
+// Mix up foreground and background colors, create new mixes!
+red := color.New(color.FgRed)
+
+boldRed := red.Add(color.Bold)
+boldRed.Println("This will print text in bold red.")
+
+whiteBackground := red.Add(color.BgWhite)
+whiteBackground.Println("Red text with White background.")
 ```
 
 ### Plug into existing code
 
 ```go
 // Use handy standard colors.
-color.Yellow.Set()
+color.Set(collor.FgYellow)
 fmt.Println("Existing text in your codebase will be now in Yellow")
 fmt.Printf("This one %s\n", "too")
 color.Unset() // don't forget to unset
 
-// You can set custom objects too
-color.New(color.FgMagenta, color.Bold).Set()
+// You can mix up parameters
+color.Set(color.FgMagenta, color.Bold)
 defer color.Unset() // use it in your function
 
 fmt.Println("All text will be now bold magenta.")

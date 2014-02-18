@@ -55,47 +55,6 @@ const (
 	BgWhite
 )
 
-// Black is an convenient helper function to print with black foreground. A
-// newline is appended to format by default.
-func Black(format string, a ...interface{}) { printColor(format, FgBlack, a...) }
-
-// Red is an convenient helper function to print with red foreground. A
-// newline is appended to format by default.
-func Red(format string, a ...interface{}) { printColor(format, FgRed, a...) }
-
-// Green is an convenient helper function to print with green foreground. A
-// newline is appended to format by default.
-func Green(format string, a ...interface{}) { printColor(format, FgGreen, a...) }
-
-// Yellow is an convenient helper function to print with yello foreground.
-// A newline is appended to format by default.
-func Yellow(format string, a ...interface{}) { printColor(format, FgYellow, a...) }
-
-// Blue is an convenient helper function to print with blue foreground. A
-// newline is appended to format by default.
-func Blue(format string, a ...interface{}) { printColor(format, FgBlue, a...) }
-
-// Magenta is an convenient helper function to print with magenta foreground.
-// A newline is appended to format by default.
-func Magenta(format string, a ...interface{}) { printColor(format, FgMagenta, a...) }
-
-// Cyan is an convenient helper function to print with cyan foreground. A
-// newline is appended to format by default.
-func Cyan(format string, a ...interface{}) { printColor(format, FgCyan, a...) }
-
-// White is an convenient helper function to print with white foreground. A
-// newline is appended to format by default.
-func White(format string, a ...interface{}) { printColor(format, FgWhite, a...) }
-
-func printColor(format string, p Parameter, a ...interface{}) {
-	if !strings.HasSuffix(format, "\n") {
-		format += "\n"
-	}
-
-	c := &Color{params: []Parameter{p}}
-	c.Printf(format, a...)
-}
-
 // New returns a newly created color object.
 func New(value ...Parameter) *Color {
 	c := &Color{params: make([]Parameter, 0)}
@@ -103,8 +62,22 @@ func New(value ...Parameter) *Color {
 	return c
 }
 
+// Set sets the given parameters immediately. It will change the color of
+// output with the given SGR parameters until color.Unset() is called.
+func Set(p ...Parameter) *Color {
+	c := New(p...)
+	c.Set()
+	return c
+}
+
+// Unset() resets all escape attributes and clears the output. Usualy should
+// be called after Set().
+func Unset() {
+	fmt.Fprintf(Output, "%s[%dm", escape, Reset)
+}
+
 // Add is used to chain SGR parameters. Use as many as paramters to combine
-// and create custom color objects. Example: Add(color.FgRed, color.Underline)
+// and create custom color objects. Example: Add(color.FgRed, color.Underline).
 func (c *Color) Add(value ...Parameter) *Color {
 	c.params = append(c.params, value...)
 	return c
@@ -165,12 +138,54 @@ func (c *Color) sequence() string {
 	return strings.Join(format, ";")
 }
 
-// Set sets the SGR sequence.
-func (c *Color) Set() {
-	fmt.Fprintf(Output, "%s[%sm", escape, c.sequence())
+func (c *Color) Blue() *Color {
+	c.Add(FgBlue)
+	return c
 }
 
-// Unset() resets all escape attributes.
-func Unset() {
-	fmt.Fprintf(Output, "%s[%dm", escape, Reset)
+// Set sets the SGR sequence.
+func (c *Color) Set() *Color {
+	fmt.Fprintf(Output, "%s[%sm", escape, c.sequence())
+	return c
+}
+
+// Black is an convenient helper function to print with black foreground. A
+// newline is appended to format by default.
+func Black(format string, a ...interface{}) { printColor(format, FgBlack, a...) }
+
+// Red is an convenient helper function to print with red foreground. A
+// newline is appended to format by default.
+func Red(format string, a ...interface{}) { printColor(format, FgRed, a...) }
+
+// Green is an convenient helper function to print with green foreground. A
+// newline is appended to format by default.
+func Green(format string, a ...interface{}) { printColor(format, FgGreen, a...) }
+
+// Yellow is an convenient helper function to print with yello foreground.
+// A newline is appended to format by default.
+func Yellow(format string, a ...interface{}) { printColor(format, FgYellow, a...) }
+
+// Blue is an convenient helper function to print with blue foreground. A
+// newline is appended to format by default.
+func Blue(format string, a ...interface{}) { printColor(format, FgBlue, a...) }
+
+// Magenta is an convenient helper function to print with magenta foreground.
+// A newline is appended to format by default.
+func Magenta(format string, a ...interface{}) { printColor(format, FgMagenta, a...) }
+
+// Cyan is an convenient helper function to print with cyan foreground. A
+// newline is appended to format by default.
+func Cyan(format string, a ...interface{}) { printColor(format, FgCyan, a...) }
+
+// White is an convenient helper function to print with white foreground. A
+// newline is appended to format by default.
+func White(format string, a ...interface{}) { printColor(format, FgWhite, a...) }
+
+func printColor(format string, p Parameter, a ...interface{}) {
+	if !strings.HasSuffix(format, "\n") {
+		format += "\n"
+	}
+
+	c := &Color{params: []Parameter{p}}
+	c.Printf(format, a...)
 }
