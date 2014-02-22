@@ -4,7 +4,7 @@
 
 Color let you use colorized outputs in terms of [ANSI Escape
 Codes](http://en.wikipedia.org/wiki/ANSI_escape_code#Colors). The API can be
-used in several way, pick one one that suits you.
+used in several way, pick one that suits you.
 
 The package is under ongoing development, checkout for regular updates.
 
