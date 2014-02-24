@@ -236,3 +236,51 @@ func printColor(format string, p Attribute, a ...interface{}) {
 	c := &Color{params: []Attribute{p}}
 	c.Printf(format, a...)
 }
+
+// BlackString is an convenient helper function to return a string with black
+// foreground.
+func BlackString(format string, a ...interface{}) string {
+	return New(FgBlack).SprintfFunc()(format, a...)
+}
+
+// RedString is an convenient helper function to return a string with red
+// foreground.
+func RedString(format string, a ...interface{}) string {
+	return New(FgRed).SprintfFunc()(format, a...)
+}
+
+// GreenString is an convenient helper function to return a string with green
+// foreground.
+func GreenString(format string, a ...interface{}) string {
+	return New(FgGreen).SprintfFunc()(format, a...)
+}
+
+// YellowString is an convenient helper function to return a string with yellow
+// foreground.
+func YellowString(format string, a ...interface{}) string {
+	return New(FgYellow).SprintfFunc()(format, a...)
+}
+
+// BlueString is an convenient helper function to return a string with blue
+// foreground.
+func BlueString(format string, a ...interface{}) string {
+	return New(FgBlue).SprintfFunc()(format, a...)
+}
+
+// MagentaString is an convenient helper function to return a string with magenta
+// foreground.
+func MagentaString(format string, a ...interface{}) string {
+	return New(FgMagenta).SprintfFunc()(format, a...)
+}
+
+// CyanString is an convenient helper function to return a string with cyan
+// foreground.
+func CyanString(format string, a ...interface{}) string {
+	return New(FgCyan).SprintfFunc()(format, a...)
+}
+
+// WhiteString is an convenient helper function to return a string with white
+// foreground.
+func WhiteString(format string, a ...interface{}) string {
+	return New(FgWhite).SprintfFunc()(format, a...)
+}

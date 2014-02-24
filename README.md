@@ -25,7 +25,6 @@ color.Blue("Prints %s in blue.", "text")
 
 // These are using by default foreground colors.
 color.Red("We have red")
-color.Yellow("Yellow color too!")
 color.Magenta("And many others ..")
 
 ```
@@ -40,7 +39,6 @@ c.Println("Prints cyan text with an underline.")
 // Or just add them to New()
 d := color.New(color.FgCyan, color.Bold)
 d.Printf("This prints bold cyan %s\n", "too!.")
-
 
 // Mix up foreground and background colors, create new mixes!
 red := color.New(color.FgRed)
@@ -69,12 +67,16 @@ notice("don't forget this...")
 
 ```go
 // Create SprintXxx functions to mix strings with other non-colorized strings:
-yellow := New(FgYellow).SprintFunc()
-red := New(FgRed).SprintFunc()
+yellow := color.New(color.FgYellow).SprintFunc()
+red := color.New(color.FgRed).SprintFunc()
 fmt.Printf("this is a %s and this is %s.\n", yellow("warning"), red("error"))
 
-info := New(FgWhite, BgGreen).SprintFunc()
+info := color.New(color.FgWhite, color.BgGreen).SprintFunc()
 fmt.Printf("this %s rocks!\n", info("package"))
+
+// use helper functions
+fmt.Printf("this", color.RedString("warning"), "should be not neglected.")
+fmt.Printf(color.GreenString("Info:"), "an important message." )
 ```
 
 ### Plug into existing code

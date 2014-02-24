@@ -112,4 +112,16 @@ func TestColor(t *testing.T) {
 	info := New(FgWhite, BgGreen).SprintFunc()
 	fmt.Printf("this %s rocks!\n", info("package"))
 
+	// Fifth Visual Test
+	fmt.Println()
+
+	fmt.Println(BlackString("black"))
+	fmt.Println(RedString("red"))
+	fmt.Println(GreenString("green"))
+	fmt.Println(YellowString("yellow"))
+	fmt.Println(BlueString("blue"))
+	fmt.Println(MagentaString("magenta"))
+	fmt.Println(CyanString("cyan"))
+	fmt.Println(WhiteString("white"))
+
 }
