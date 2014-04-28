@@ -89,7 +89,7 @@ fmt.Printf(color.GreenString("Info:"), "an important message." )
 
 ```go
 // Use handy standard colors.
-color.Set(collor.FgYellow)
+color.Set(color.FgYellow)
 
 fmt.Println("Existing text will be now in Yellow")
 fmt.Printf("This one %s\n", "too")
