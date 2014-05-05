@@ -6,7 +6,6 @@ Color let you use colorized outputs in terms of [ANSI Escape
 Codes](http://en.wikipedia.org/wiki/ANSI_escape_code#Colors). The API can be
 used in several way, pick one that suits you.
 
-The package is under ongoing development, checkout for regular updates.
 
 
 ![Color](http://i.imgur.com/c1JI0lA.png)
@@ -56,7 +55,7 @@ whiteBackground := red.Add(color.BgWhite)
 whiteBackground.Println("Red text with White background.")
 ```
 
-### Custom print functions
+### Custom print functions (PrintFunc)
 
 ```go
 // Create a custom print function for convenient
@@ -69,7 +68,7 @@ notice := color.New(color.Bold, color.FgGreen).PrintlnFunc()
 notice("don't forget this...")
 ```
 
-### Insert into noncolor strings
+### Insert into noncolor strings (SprintFunc)
 
 ```go
 // Create SprintXxx functions to mix strings with other non-colorized strings:
