@@ -2,9 +2,9 @@
 
 
 
-Color let you use colorized outputs in terms of [ANSI Escape
+Color lets you use colorized outputs in terms of [ANSI Escape
 Codes](http://en.wikipedia.org/wiki/ANSI_escape_code#Colors). The API can be
-used in several way, pick one that suits you.
+used in several ways, pick one that suits you.
 
 
 
@@ -25,10 +25,10 @@ go get github.com/fatih/color
 // Print with default helper functions
 color.Cyan("Prints text in cyan.")
 
-// a newline will be appended automatically
+// A newline will be appended automatically
 color.Blue("Prints %s in blue.", "text")
 
-// These are using by default foreground colors.
+// These are using the default foreground colors
 color.Red("We have red")
 color.Magenta("And many others ..")
 
@@ -52,20 +52,20 @@ boldRed := red.Add(color.Bold)
 boldRed.Println("This will print text in bold red.")
 
 whiteBackground := red.Add(color.BgWhite)
-whiteBackground.Println("Red text with White background.")
+whiteBackground.Println("Red text with white background.")
 ```
 
 ### Custom print functions (PrintFunc)
 
 ```go
-// Create a custom print function for convenient
+// Create a custom print function for convenience
 red := color.New(color.FgRed).PrintfFunc()
-red("warning")
-red("error: %s", err)
+red("Warning")
+red("Error: %s", err)
 
 // Mix up multiple attributes
 notice := color.New(color.Bold, color.FgGreen).PrintlnFunc()
-notice("don't forget this...")
+notice("Don't forget this...")
 ```
 
 ### Insert into noncolor strings (SprintFunc)
@@ -74,32 +74,32 @@ notice("don't forget this...")
 // Create SprintXxx functions to mix strings with other non-colorized strings:
 yellow := color.New(color.FgYellow).SprintFunc()
 red := color.New(color.FgRed).SprintFunc()
-fmt.Printf("this is a %s and this is %s.\n", yellow("warning"), red("error"))
+fmt.Printf("This is a %s and this is %s.\n", yellow("warning"), red("error"))
 
 info := color.New(color.FgWhite, color.BgGreen).SprintFunc()
-fmt.Printf("this %s rocks!\n", info("package"))
+fmt.Printf("This %s rocks!\n", info("package"))
 
-// use helper functions
-fmt.Printf("this", color.RedString("warning"), "should be not neglected.")
+// Use helper functions
+fmt.Printf("This", color.RedString("warning"), "should be not neglected.")
 fmt.Printf(color.GreenString("Info:"), "an important message." )
 ```
 
 ### Plug into existing code
 
 ```go
-// Use handy standard colors.
+// Use handy standard colors
 color.Set(color.FgYellow)
 
-fmt.Println("Existing text will be now in Yellow")
+fmt.Println("Existing text will now be in yellow")
 fmt.Printf("This one %s\n", "too")
 
-color.Unset() // don't forget to unset
+color.Unset() // Don't forget to unset
 
 // You can mix up parameters
 color.Set(color.FgMagenta, color.Bold)
-defer color.Unset() // use it in your function
+defer color.Unset() // Use it in your function
 
-fmt.Println("All text will be now bold magenta.")
+fmt.Println("All text will now be bold magenta.")
 ```
 
 ## Todo
