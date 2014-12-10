@@ -1,4 +1,4 @@
-# Color [![GoDoc](https://godoc.org/github.com/fatih/color?status.svg)](http://godoc.org/github.com/fatih/color) [![Build Status](https://travis-ci.org/fatih/color.svg)](https://travis-ci.org/fatih/color)
+# Color [![GoDoc](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://godoc.org/github.com/fatih/color) [![Build Status](http://img.shields.io/travis/fatih/color.svg?style=flat-square)](https://travis-ci.org/fatih/color)
 
 
 
