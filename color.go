@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/shiena/ansicolor"
 )
 
 // Color defines a custom color object which is defined by SGR parameters.
@@ -92,7 +94,7 @@ func (c *Color) prepend(value Attribute) {
 
 // Output defines the standard output of the print functions. By default
 // os.Stdout is used.
-var Output io.Writer = os.Stdout
+var Output io.Writer = ansicolor.NewAnsiColorWriter(os.Stdout)
 
 // Print formats using the default formats for its operands and writes to
 // standard output. Spaces are added between operands when neither is a
@@ -148,7 +150,10 @@ func (c *Color) PrintlnFunc() func(a ...interface{}) {
 
 // SprintFunc returns a new function that returns colorized strings for the
 // given arguments with fmt.Sprint(). Useful to put into or mix into other
-// string.
+// string. Windows users should use this in conjuction with color.Output, example:
+//
+//	put := New(FgYellow).SprintFunc()
+//	fmt.Ffprintf(color.Output, "This is a %s", put("warning"))
 func (c *Color) SprintFunc() func(a ...interface{}) string {
 	return func(a ...interface{}) string {
 		return c.wrap(fmt.Sprint(a...))
@@ -157,7 +162,7 @@ func (c *Color) SprintFunc() func(a ...interface{}) string {
 
 // SprintfFunc returns a new function that returns colorized strings for the
 // given arguments with fmt.Sprintf(). Useful to put into or mix into other
-// string.
+// string. Windows users should use this in conjuction with color.Output.
 func (c *Color) SprintfFunc() func(format string, a ...interface{}) string {
 	return func(format string, a ...interface{}) string {
 		return c.wrap(fmt.Sprintf(format, a...))
@@ -166,7 +171,7 @@ func (c *Color) SprintfFunc() func(format string, a ...interface{}) string {
 
 // SprintlnFunc returns a new function that returns colorized strings for the
 // given arguments with fmt.Sprintln(). Useful to put into or mix into other
-// string.
+// string. Windows users should use this in conjuction with color.Output.
 func (c *Color) SprintlnFunc() func(a ...interface{}) string {
 	return func(a ...interface{}) string {
 		return c.wrap(fmt.Sprintln(a...))
