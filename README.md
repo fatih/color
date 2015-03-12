@@ -4,7 +4,7 @@
 
 Color lets you use colorized outputs in terms of [ANSI Escape
 Codes](http://en.wikipedia.org/wiki/ANSI_escape_code#Colors). The API can be
-used in several ways, pick one that suits you.
+used in several ways, pick one that suits you. It has support for Windows too!
 
 
 
@@ -82,6 +82,9 @@ fmt.Printf("This %s rocks!\n", info("package"))
 // Use helper functions
 fmt.Printf("This", color.RedString("warning"), "should be not neglected.")
 fmt.Printf(color.GreenString("Info:"), "an important message." )
+
+// Windows supported too! Just don't forget to change the output to color.Output
+fmt.Fprintf(color.Output, "Windows support: %s", color.GreenString("PASS"))
 ```
 
 ### Plug into existing code
@@ -105,13 +108,13 @@ fmt.Println("All text will now be bold magenta.")
 ## Todo
 
 * Save/Return previous values
-* Add Windows support
 * Evaluate fmt.Formatter interface
 
 
 ## Credits
 
  * [Fatih Arslan](https://github.com/fatih)
+ * Windows support via @shiena: [ansicolor](https://github.com/shiena/ansicolor)
 
 ## License
 
