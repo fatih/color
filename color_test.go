@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"runtime"
 	"testing"
 )
 
@@ -11,6 +12,10 @@ import (
 // escaped formatted results. Next we create some visual tests to be tested.
 // Each visual test includes the color name to be compared.
 func TestColor(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows is not supported")
+	}
+
 	rb := new(bytes.Buffer)
 	Output = rb
 
