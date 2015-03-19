@@ -3,7 +3,7 @@
 
 
 Color lets you use colorized outputs in terms of [ANSI Escape
-Codes](http://en.wikipedia.org/wiki/ANSI_escape_code#Colors). The API can be
+Codes](http://en.wikipedia.org/wiki/ANSI_escape_code#Colors) in Go (Golang). The API can be
 used in several ways, pick one that suits you. It has support for Windows too!
 
 
