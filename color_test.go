@@ -70,7 +70,18 @@ func TestNoColor(t *testing.T) {
 		p.Print(c.text)
 
 		line, _ := rb.ReadString('\n')
+		if line != c.text {
+			t.Errorf("Expecting %s, got '%s'\n", c.text, line)
+		}
+	}
 
+	// global check
+	NoColor = true
+	for _, c := range testColors {
+		p := New(c.code)
+		p.Print(c.text)
+
+		line, _ := rb.ReadString('\n')
 		if line != c.text {
 			t.Errorf("Expecting %s, got '%s'\n", c.text, line)
 		}
