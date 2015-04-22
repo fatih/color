@@ -10,9 +10,15 @@ import (
 	"github.com/shiena/ansicolor"
 )
 
+// NoColor defines if the output is colorized or not. By default it's set to
+// false. This is a global option and affects all colors. For more control over
+// each color block use the methods DisableColor() individually.
+var NoColor bool = false
+
 // Color defines a custom color object which is defined by SGR parameters.
 type Color struct {
-	params []Attribute
+	params  []Attribute
+	noColor *bool
 }
 
 // Attribute defines a single SGR Code
@@ -69,14 +75,36 @@ func New(value ...Attribute) *Color {
 // output with the given SGR parameters until color.Unset() is called.
 func Set(p ...Attribute) *Color {
 	c := New(p...)
-	c.Set()
+	c.set()
 	return c
 }
 
 // Unset resets all escape attributes and clears the output. Usually should
 // be called after Set().
 func Unset() {
+	if NoColor {
+		return
+	}
+
 	fmt.Fprintf(Output, "%s[%dm", escape, Reset)
+}
+
+// set sets the SGR sequence.
+func (c *Color) set() *Color {
+	if c.isNoColorSet() {
+		return c
+	}
+
+	fmt.Fprintf(Output, c.format())
+	return c
+}
+
+func (c *Color) unset() {
+	if c.isNoColorSet() {
+		return
+	}
+
+	Unset()
 }
 
 // Add is used to chain SGR parameters. Use as many as parameters to combine
@@ -102,8 +130,8 @@ var Output io.Writer = ansicolor.NewAnsiColorWriter(os.Stdout)
 // encountered. This is the standard fmt.Print() method wrapped with the given
 // color.
 func (c *Color) Print(a ...interface{}) (n int, err error) {
-	c.Set()
-	defer Unset()
+	c.set()
+	defer c.unset()
 
 	return fmt.Fprint(Output, a...)
 }
@@ -112,8 +140,8 @@ func (c *Color) Print(a ...interface{}) (n int, err error) {
 // It returns the number of bytes written and any write error encountered.
 // This is the standard fmt.Printf() method wrapped with the given color.
 func (c *Color) Printf(format string, a ...interface{}) (n int, err error) {
-	c.Set()
-	defer Unset()
+	c.set()
+	defer c.unset()
 
 	return fmt.Fprintf(Output, format, a...)
 }
@@ -124,8 +152,8 @@ func (c *Color) Printf(format string, a ...interface{}) (n int, err error) {
 // encountered. This is the standard fmt.Print() method wrapped with the given
 // color.
 func (c *Color) Println(a ...interface{}) (n int, err error) {
-	c.Set()
-	defer Unset()
+	c.set()
+	defer c.unset()
 
 	return fmt.Fprintln(Output, a...)
 }
@@ -189,16 +217,49 @@ func (c *Color) sequence() string {
 	return strings.Join(format, ";")
 }
 
-func (c *Color) wrap(s string) string { return c.format() + s + c.unformat() }
+// wrap wraps the s string with the colors attributes. The string is ready to
+// be printed.
+func (c *Color) wrap(s string) string {
+	if c.isNoColorSet() {
+		return s
+	}
 
-func (c *Color) format() string { return fmt.Sprintf("%s[%sm", escape, c.sequence()) }
+	return c.format() + s + c.unformat()
+}
 
-func (c *Color) unformat() string { return fmt.Sprintf("%s[%dm", escape, Reset) }
+func (c *Color) format() string {
+	return fmt.Sprintf("%s[%sm", escape, c.sequence())
+}
 
-// Set sets the SGR sequence.
-func (c *Color) Set() *Color {
-	fmt.Fprintf(Output, c.format())
-	return c
+func (c *Color) unformat() string {
+	return fmt.Sprintf("%s[%dm", escape, Reset)
+}
+
+// DisableColor disables the color output. Useful to not change any existing
+// code and still being able to output. Can be used for flags like
+// "--no-color". To enable back use EnableColor() method.
+func (c *Color) DisableColor() {
+	c.noColor = boolPtr(true)
+}
+
+// EnableColor enables the color output. Use it in conjuction with
+// DisableColor(). Otherwise this method has no side effects.
+func (c *Color) EnableColor() {
+	c.noColor = boolPtr(false)
+}
+
+func (c *Color) isNoColorSet() bool {
+	// check first if we have user setted action
+	if c.noColor != nil {
+		return *c.noColor
+	}
+
+	// if not return the global option, which is disabled by default
+	return NoColor
+}
+
+func boolPtr(v bool) *bool {
+	return &v
 }
 
 // Black is an convenient helper function to print with black foreground. A

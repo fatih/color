@@ -44,7 +44,52 @@ func TestColor(t *testing.T) {
 			t.Errorf("Expecting %s, got '%s'\n", escapedForm, scannedLine)
 		}
 	}
+}
 
+func TestNoColor(t *testing.T) {
+	rb := new(bytes.Buffer)
+	Output = rb
+
+	testColors := []struct {
+		text string
+		code Attribute
+	}{
+		{text: "black", code: FgBlack},
+		{text: "red", code: FgRed},
+		{text: "green", code: FgGreen},
+		{text: "yellow", code: FgYellow},
+		{text: "blue", code: FgBlue},
+		{text: "magent", code: FgMagenta},
+		{text: "cyan", code: FgCyan},
+		{text: "white", code: FgWhite},
+	}
+
+	for _, c := range testColors {
+		p := New(c.code)
+		p.DisableColor()
+		p.Print(c.text)
+
+		line, _ := rb.ReadString('\n')
+		if line != c.text {
+			t.Errorf("Expecting %s, got '%s'\n", c.text, line)
+		}
+	}
+
+	// global check
+	NoColor = true
+	for _, c := range testColors {
+		p := New(c.code)
+		p.Print(c.text)
+
+		line, _ := rb.ReadString('\n')
+		if line != c.text {
+			t.Errorf("Expecting %s, got '%s'\n", c.text, line)
+		}
+	}
+
+}
+
+func TestColorVisual(t *testing.T) {
 	// First Visual Test
 	fmt.Println("")
 	Output = ansicolor.NewAnsiColorWriter(os.Stdout)
@@ -125,5 +170,4 @@ func TestColor(t *testing.T) {
 	fmt.Fprintln(Output, MagentaString("magenta"))
 	fmt.Fprintln(Output, CyanString("cyan"))
 	fmt.Fprintln(Output, WhiteString("white"))
-
 }
