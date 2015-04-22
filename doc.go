@@ -64,11 +64,10 @@ Windows support is enabled by default. All Print functions works as intended.
 However only for color.SprintXXX functions, user should use fmt.FprintXXX and
 set the output to color.Output:
 
-	fmt.Fprintf(color.Output, "Windows support: %s", color.GreenString("PASS"))
+    fmt.Fprintf(color.Output, "Windows support: %s", color.GreenString("PASS"))
 
     info := New(FgWhite, BgGreen).SprintFunc()
     fmt.Fprintf(color.Output, "this %s rocks!\n", info("package"))
-
 
 Using with existing code is possible. Just use the Set() method to set the
 standard output to the given parameters. That way a rewrite of an existing
