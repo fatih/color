@@ -103,6 +103,37 @@ defer color.Unset() // Use it in your function
 fmt.Println("All text will now be bold magenta.")
 ```
 
+### Disable color
+
+There might be a case where you want to disable color output (for example to
+pipe the standard output of your app to somewhere else). `Color` has support to
+disable colors both globally and for single color definition. For example
+suppose you have a CLI app and a `--no-color` bool flag. You can easily disable
+the color output with:
+
+```go
+
+var flagNoColor = flag.Bool("no-color", false, "Disable color output")
+
+if *flagNoColor {
+	color.NoColor = true // disables colorized output
+}
+```
+
+It also has support for single color definitions (local). You can
+disable/enable color output on the fly:
+
+```go
+c := color.New(color.FgCyan)
+c.Println("Prints cyan text")
+
+c.DisableColor()
+c.Println("This is printed without any color")
+
+c.EnableColor()
+c.Println("This prints again cyan...")
+```
+
 ## Todo
 
 * Save/Return previous values
