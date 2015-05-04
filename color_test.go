@@ -77,6 +77,9 @@ func TestNoColor(t *testing.T) {
 
 	// global check
 	NoColor = true
+	defer func() {
+		NoColor = false
+	}()
 	for _, c := range testColors {
 		p := New(c.code)
 		p.Print(c.text)
