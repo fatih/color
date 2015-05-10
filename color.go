@@ -2,7 +2,6 @@ package color
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -13,7 +12,7 @@ import (
 // NoColor defines if the output is colorized or not. By default it's set to
 // false. This is a global option and affects all colors. For more control over
 // each color block use the methods DisableColor() individually.
-var NoColor bool = false
+var NoColor = false
 
 // Color defines a custom color object which is defined by SGR parameters.
 type Color struct {
@@ -122,7 +121,7 @@ func (c *Color) prepend(value Attribute) {
 
 // Output defines the standard output of the print functions. By default
 // os.Stdout is used.
-var Output io.Writer = ansicolor.NewAnsiColorWriter(os.Stdout)
+var Output = ansicolor.NewAnsiColorWriter(os.Stdout)
 
 // Print formats using the default formats for its operands and writes to
 // standard output. Spaces are added between operands when neither is a
