@@ -6,13 +6,14 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/robertkrimen/isatty"
 	"github.com/shiena/ansicolor"
 )
 
 // NoColor defines if the output is colorized or not. By default it's set to
 // false. This is a global option and affects all colors. For more control over
 // each color block use the methods DisableColor() individually.
-var NoColor = false
+var NoColor = !isatty.Check(os.Stdout.Fd())
 
 // Color defines a custom color object which is defined by SGR parameters.
 type Color struct {
