@@ -182,7 +182,7 @@ func (c *Color) PrintlnFunc() func(a ...interface{}) {
 // string. Windows users should use this in conjuction with color.Output, example:
 //
 //	put := New(FgYellow).SprintFunc()
-//	fmt.Ffprintf(color.Output, "This is a %s", put("warning"))
+//	fmt.Fprintf(color.Output, "This is a %s", put("warning"))
 func (c *Color) SprintFunc() func(a ...interface{}) string {
 	return func(a ...interface{}) string {
 		return c.wrap(fmt.Sprint(a...))
