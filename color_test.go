@@ -16,6 +16,8 @@ func TestColor(t *testing.T) {
 	rb := new(bytes.Buffer)
 	Output = rb
 
+	NoColor = false
+
 	testColors := []struct {
 		text string
 		code Attribute
