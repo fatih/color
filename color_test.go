@@ -48,6 +48,40 @@ func TestColor(t *testing.T) {
 	}
 }
 
+func TestColorEquals(t *testing.T) {
+	fgblack1 := New(FgBlack)
+	fgblack2 := New(FgBlack)
+	bgblack := New(BgBlack)
+	fgbgblack := New(FgBlack, BgBlack)
+	fgblackbgred := New(FgBlack, BgRed)
+	fgred := New(FgRed)
+	bgred := New(BgRed)
+
+	if !fgblack1.Equals(fgblack2) {
+		t.Error("Two black colors are not equal")
+	}
+
+	if fgblack1.Equals(bgblack) {
+		t.Error("Fg and bg black colors are equal")
+	}
+
+	if fgblack1.Equals(fgbgblack) {
+		t.Error("Fg black equals fg/bg black color")
+	}
+
+	if fgblack1.Equals(fgred) {
+		t.Error("Fg black equals Fg red")
+	}
+
+	if fgblack1.Equals(bgred) {
+		t.Error("Fg black equals Bg red")
+	}
+
+	if fgblack1.Equals(fgblackbgred) {
+		t.Error("Fg black equals fg black bg red")
+	}
+}
+
 func TestNoColor(t *testing.T) {
 	rb := new(bytes.Buffer)
 	Output = rb
