@@ -30,6 +30,14 @@ func TestColor(t *testing.T) {
 		{text: "magent", code: FgMagenta},
 		{text: "cyan", code: FgCyan},
 		{text: "white", code: FgWhite},
+		{text: "hblack", code: FgHiBlack},
+		{text: "hred", code: FgHiRed},
+		{text: "hgreen", code: FgHiGreen},
+		{text: "hyellow", code: FgHiYellow},
+		{text: "hblue", code: FgHiBlue},
+		{text: "hmagent", code: FgHiMagenta},
+		{text: "hcyan", code: FgHiCyan},
+		{text: "hwhite", code: FgHiWhite},
 	}
 
 	for _, c := range testColors {
@@ -98,6 +106,14 @@ func TestNoColor(t *testing.T) {
 		{text: "magent", code: FgMagenta},
 		{text: "cyan", code: FgCyan},
 		{text: "white", code: FgWhite},
+		{text: "hblack", code: FgHiBlack},
+		{text: "hred", code: FgHiRed},
+		{text: "hgreen", code: FgHiGreen},
+		{text: "hyellow", code: FgHiYellow},
+		{text: "hblue", code: FgHiBlue},
+		{text: "hmagent", code: FgHiMagenta},
+		{text: "hcyan", code: FgHiCyan},
+		{text: "hwhite", code: FgHiWhite},
 	}
 
 	for _, c := range testColors {
