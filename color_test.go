@@ -3,10 +3,9 @@ package color
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"testing"
 
-	"github.com/shiena/ansicolor"
+	"github.com/mattn/go-colorable"
 )
 
 // Testing colors is kinda different. First we test for given colors and their
@@ -146,8 +145,7 @@ func TestNoColor(t *testing.T) {
 
 func TestColorVisual(t *testing.T) {
 	// First Visual Test
-	fmt.Println("")
-	Output = ansicolor.NewAnsiColorWriter(os.Stdout)
+	Output = colorable.NewColorableStdout()
 
 	New(FgRed).Printf("red\t")
 	New(BgRed).Print("         ")
