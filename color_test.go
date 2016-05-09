@@ -143,6 +143,16 @@ func TestNoColor(t *testing.T) {
 
 }
 
+func TestEscape(t *testing.T) {
+	unescaped := "\x1b[32mGreen"
+	escaped := "\\x1b[32mGreen"
+	got := Escape(unescaped)
+
+	if got != escaped {
+		t.Errorf("Expecting %s, got '%s'\n", escaped, got)
+	}
+}
+
 func TestColorVisual(t *testing.T) {
 	// First Visual Test
 	Output = colorable.NewColorableStdout()
@@ -223,4 +233,10 @@ func TestColorVisual(t *testing.T) {
 	fmt.Fprintln(Output, MagentaString("magenta"))
 	fmt.Fprintln(Output, CyanString("cyan"))
 	fmt.Fprintln(Output, WhiteString("white"))
+
+	// Escape Test
+	fmt.Println()
+
+	fmt.Fprintln(Output, Escape("\x1b[32mGreen should be escaped (and not colored)"))
+	Unset()
 }

@@ -26,6 +26,7 @@ type Color struct {
 type Attribute int
 
 const escape = "\x1b"
+const unescape = "\\x1b"
 
 // Base attributes
 const (
@@ -399,4 +400,9 @@ func CyanString(format string, a ...interface{}) string {
 // foreground.
 func WhiteString(format string, a ...interface{}) string {
 	return New(FgWhite).SprintfFunc()(format, a...)
+}
+
+// Escape escapes color characters on a string.
+func Escape(s string) string {
+	return strings.Replace(s, escape, unescape, -1)
 }

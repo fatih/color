@@ -137,6 +137,14 @@ c.EnableColor()
 c.Println("This prints again cyan...")
 ```
 
+### Escape
+
+Escape colorized outputs as verbatim.
+
+```go
+fmt.Printf(color.Escape("\x1b[32misprinted verbatim")) // prints \x1b[32misprinted verbatim on terminal
+```
+
 ## Todo
 
 * Save/Return previous values
