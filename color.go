@@ -184,21 +184,21 @@ func (c *Color) Println(a ...interface{}) (n int, err error) {
 }
 
 // PrintFunc returns a new function that prints the passed arguments as
-// colorized with color.Print().
-func (c *Color) PrintFunc() func(a ...interface{}) {
-	return func(a ...interface{}) { c.Print(a...) }
+// colorized with color.Print(). Equivalent to c.Print.
+func (c *Color) PrintFunc() func(a ...interface{}) (int, error) {
+	return c.Print
 }
 
 // PrintfFunc returns a new function that prints the passed arguments as
-// colorized with color.Printf().
-func (c *Color) PrintfFunc() func(format string, a ...interface{}) {
-	return func(format string, a ...interface{}) { c.Printf(format, a...) }
+// colorized with color.Printf(). Equivalent to c.Printf.
+func (c *Color) PrintfFunc() func(format string, a ...interface{}) (int, error) {
+	return c.Printf
 }
 
 // PrintlnFunc returns a new function that prints the passed arguments as
-// colorized with color.Println().
-func (c *Color) PrintlnFunc() func(a ...interface{}) {
-	return func(a ...interface{}) { c.Println(a...) }
+// colorized with color.Println(). Equivalent to c.Println.
+func (c *Color) PrintlnFunc() func(a ...interface{}) (int, error) {
+	return c.Println
 }
 
 // SprintFunc returns a new function that returns colorized strings for the
