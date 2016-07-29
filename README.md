@@ -24,14 +24,14 @@ go get github.com/fatih/color
 
 ```go
 // Print with default helper functions
-color.Cyan("Prints text in cyan.")
+color.Cyan("Prints text in cyan.\n")
 
-// A newline will be appended automatically
-color.Blue("Prints %s in blue.", "text")
+// a newline will not be automatically added
+color.Blue("Prints %s in blue.\n", "text")
 
 // These are using the default foreground colors
-color.Red("We have red")
-color.Magenta("And many others ..")
+color.Red("We have red ")
+color.Magenta("and many others...\n")
 
 ```
 
@@ -151,4 +151,3 @@ c.Println("This prints again cyan...")
 ## License
 
 The MIT License (MIT) - see [`LICENSE.md`](https://github.com/fatih/color/blob/master/LICENSE.md) for more details
-

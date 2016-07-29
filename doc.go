@@ -7,8 +7,8 @@ Use simple and default helper functions with predefined foreground colors:
 
     color.Cyan("Prints text in cyan.")
 
-    // a newline will be appended automatically
-    color.Blue("Prints %s in blue.", "text")
+    // a newline will not be appended automatically
+    color.Blue("Prints %s in blue.\n", "text")
 
     // More default foreground colors..
     color.Red("We have red")
