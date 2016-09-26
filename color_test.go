@@ -224,3 +224,28 @@ func TestColorVisual(t *testing.T) {
 	fmt.Fprintln(Output, CyanString("cyan"))
 	fmt.Fprintln(Output, WhiteString("white"))
 }
+
+func TestNoFormat(t *testing.T) {
+	tests := []struct {
+		f      func(string, ...interface{}) string
+		format string
+		args   []interface{}
+		want   string
+	}{
+		{BlackString, "%s", nil, "\x1b[30m%s\x1b[0m"},
+		{RedString, "%s", nil, "\x1b[31m%s\x1b[0m"},
+		{GreenString, "%s", nil, "\x1b[32m%s\x1b[0m"},
+		{YellowString, "%s", nil, "\x1b[33m%s\x1b[0m"},
+		{BlueString, "%s", nil, "\x1b[34m%s\x1b[0m"},
+		{MagentaString, "%s", nil, "\x1b[35m%s\x1b[0m"},
+		{CyanString, "%s", nil, "\x1b[36m%s\x1b[0m"},
+		{WhiteString, "%s", nil, "\x1b[37m%s\x1b[0m"},
+	}
+
+	for i, test := range tests {
+		s := fmt.Sprintf("%s", test.f(test.format, test.args...))
+		if s != test.want {
+			t.Errorf("[%d] want: %q, got: %q", i, test.want, s)
+		}
+	}
+}
