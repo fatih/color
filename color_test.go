@@ -226,6 +226,32 @@ func TestColorVisual(t *testing.T) {
 }
 
 func TestNoFormat(t *testing.T) {
+	fmt.Printf("%s   %%s = ", BlackString("Black"))
+	Black("%s")
+
+	fmt.Printf("%s     %%s = ", RedString("Red"))
+	Red("%s")
+
+	fmt.Printf("%s   %%s = ", GreenString("Green"))
+	Green("%s")
+
+	fmt.Printf("%s  %%s = ", YellowString("Yellow"))
+	Yellow("%s")
+
+	fmt.Printf("%s    %%s = ", BlueString("Blue"))
+	Blue("%s")
+
+	fmt.Printf("%s %%s = ", MagentaString("Magenta"))
+	Magenta("%s")
+
+	fmt.Printf("%s    %%s = ", CyanString("Cyan"))
+	Cyan("%s")
+
+	fmt.Printf("%s   %%s = ", WhiteString("White"))
+	White("%s")
+}
+
+func TestNoFormatString(t *testing.T) {
 	tests := []struct {
 		f      func(string, ...interface{}) string
 		format string
