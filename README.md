@@ -81,8 +81,8 @@ info := color.New(color.FgWhite, color.BgGreen).SprintFunc()
 fmt.Printf("This %s rocks!\n", info("package"))
 
 // Use helper functions
-fmt.Printf("This", color.RedString("warning"), "should be not neglected.")
-fmt.Printf(color.GreenString("Info:"), "an important message." )
+fmt.Println("This", color.RedString("warning"), "should be not neglected.")
+fmt.Printf("%v %v\n", color.GreenString("Info:"), "an important message.")
 
 // Windows supported too! Just don't forget to change the output to color.Output
 fmt.Fprintf(color.Output, "Windows support: %s", color.GreenString("PASS"))
