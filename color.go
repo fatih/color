@@ -316,12 +316,17 @@ func boolPtr(v bool) *bool {
 // allows to reuse already created objects with required Attribute.
 var colorsCache = make(map[Attribute]*Color)
 
-func printColor(format string, p Attribute, a ...interface{}) {
+func getCachedColor(p Attribute) *Color {
 	c, ok := colorsCache[p]
 	if !ok {
 		c = New(p)
 		colorsCache[p] = c
 	}
+	return c
+}
+
+func printColor(format string, p Attribute, a ...interface{}) {
+	c := getCachedColor(p)
 
 	if len(a) == 0 {
 		a = append(a, format)
@@ -336,11 +341,7 @@ func printColor(format string, p Attribute, a ...interface{}) {
 }
 
 func printString(format string, p Attribute, a ...interface{}) string {
-	c, ok := colorsCache[p]
-	if !ok {
-		c = New(p)
-		colorsCache[p] = c
-	}
+	c := getCachedColor(p)
 
 	if len(a) == 0 {
 		a = append(a, format)
