@@ -312,6 +312,44 @@ func boolPtr(v bool) *bool {
 	return &v
 }
 
+// colorsCache is used to reduce the count of created Color objects and
+// allows to reuse already created objects with required Attribute.
+var colorsCache = make(map[Attribute]*Color)
+
+func printColor(format string, p Attribute, a ...interface{}) {
+	c, ok := colorsCache[p]
+	if !ok {
+		c = New(p)
+		colorsCache[p] = c
+	}
+
+	if len(a) == 0 {
+		a = append(a, format)
+		format = "%s"
+	}
+
+	if !strings.HasSuffix(format, "\n") {
+		format += "\n"
+	}
+
+	c.Printf(format, a...)
+}
+
+func printString(format string, p Attribute, a ...interface{}) string {
+	c, ok := colorsCache[p]
+	if !ok {
+		c = New(p)
+		colorsCache[p] = c
+	}
+
+	if len(a) == 0 {
+		a = append(a, format)
+		format = "%s"
+	}
+
+	return c.SprintfFunc()(format, a...)
+}
+
 // Black is an convenient helper function to print with black foreground. A
 // newline is appended to format by default.
 func Black(format string, a ...interface{}) { printColor(format, FgBlack, a...) }
@@ -343,28 +381,6 @@ func Cyan(format string, a ...interface{}) { printColor(format, FgCyan, a...) }
 // White is an convenient helper function to print with white foreground. A
 // newline is appended to format by default.
 func White(format string, a ...interface{}) { printColor(format, FgWhite, a...) }
-
-func printColor(format string, p Attribute, a ...interface{}) {
-	if len(a) == 0 {
-		a = append(a, format)
-		format = "%s"
-	}
-
-	if !strings.HasSuffix(format, "\n") {
-		format += "\n"
-	}
-
-	c := &Color{params: []Attribute{p}}
-	c.Printf(format, a...)
-}
-
-func printString(format string, p Attribute, a ...interface{}) string {
-	if len(a) == 0 {
-		a = append(a, format)
-		format = "%s"
-	}
-	return New(p).SprintfFunc()(format, a...)
-}
 
 // BlackString is an convenient helper function to return a string with black
 // foreground.
