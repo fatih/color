@@ -354,8 +354,7 @@ func printColor(format string, p Attribute, a ...interface{}) {
 		format += "\n"
 	}
 
-	c := &Color{params: []Attribute{p}}
-	c.Printf(format, a...)
+	New(p).Printf(format, a...)
 }
 
 func printString(format string, p Attribute, a ...interface{}) string {
