@@ -16,10 +16,15 @@ import (
 // over each color block use the methods DisableColor() individually.
 var NoColor = !isatty.IsTerminal(os.Stdout.Fd())
 
+var EscapeZshPrompt = false
+var EscapeBashPrompt = false
+
 // Color defines a custom color object which is defined by SGR parameters.
 type Color struct {
-	params  []Attribute
-	noColor *bool
+	params             []Attribute
+	noColor            *bool
+	zshPromptEscaping  *bool
+	bashPromptEscaping *bool
 }
 
 // Attribute defines a single SGR Code
@@ -249,7 +254,19 @@ func (c *Color) wrap(s string) string {
 		return s
 	}
 
-	return c.format() + s + c.unformat()
+	return c.promptWrap(c.format()) + s + c.promptWrap(c.unformat())
+}
+
+func (c *Color) promptWrap(attr string) string {
+	if c.isZshPromptEscSet() {
+		return "%{" + attr + "%}"
+	}
+
+	if c.isBashPromptEscSet() {
+		return "\\[" + attr + "\\]"
+	}
+
+	return attr
 }
 
 func (c *Color) format() string {
@@ -281,6 +298,42 @@ func (c *Color) isNoColorSet() bool {
 
 	// if not return the global option, which is disabled by default
 	return NoColor
+}
+
+// DisableZshPromptEscaping disables the color attribute escaping with `%{%}`
+func (c *Color) DisableZshPromptEscaping() {
+	c.zshPromptEscaping = boolPtr(false)
+}
+
+// EnableZshPromptEscaping enables the color attribute escaping with `%{%}`
+func (c *Color) EnableZshPromptEscaping() {
+	c.zshPromptEscaping = boolPtr(true)
+}
+
+func (c *Color) isZshPromptEscSet() bool {
+	if c.zshPromptEscaping != nil {
+		return *c.zshPromptEscaping
+	}
+
+	return EscapeZshPrompt
+}
+
+// DisableBashPromptEscaping disables the color attribute escaping with `%{%}`
+func (c *Color) DisableBashPromptEscaping() {
+	c.bashPromptEscaping = boolPtr(false)
+}
+
+// EnableBashPromptEscaping enables the color attribute escaping with `%{%}`
+func (c *Color) EnableBashPromptEscaping() {
+	c.bashPromptEscaping = boolPtr(true)
+}
+
+func (c *Color) isBashPromptEscSet() bool {
+	if c.bashPromptEscaping != nil {
+		return *c.bashPromptEscaping
+	}
+
+	return EscapeBashPrompt
 }
 
 // Equals returns a boolean value indicating whether two colors are equal.
