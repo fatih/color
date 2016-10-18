@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/mattn/go-colorable"
 	"github.com/mattn/go-isatty"
@@ -316,12 +317,18 @@ func boolPtr(v bool) *bool {
 // allows to reuse already created objects with required Attribute.
 var colorsCache = make(map[Attribute]*Color)
 
+var colorsCacheMu = new(sync.Mutex) // protects colorsCache
+
 func getCachedColor(p Attribute) *Color {
+	colorsCacheMu.Lock()
+	defer colorsCacheMu.Unlock()
+
 	c, ok := colorsCache[p]
 	if !ok {
 		c = New(p)
 		colorsCache[p] = c
 	}
+
 	return c
 }
 
