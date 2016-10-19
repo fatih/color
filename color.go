@@ -335,13 +335,13 @@ func getCachedColor(p Attribute) *Color {
 func printColor(format string, p Attribute, a ...interface{}) {
 	c := getCachedColor(p)
 
-	if len(a) == 0 {
-		a = append(a, format)
-		format = "%s"
-	}
-
 	if !strings.HasSuffix(format, "\n") {
 		format += "\n"
+	}
+
+	if len(a) == 0 {
+		c.Print(format)
+		return
 	}
 
 	c.Printf(format, a...)
@@ -351,8 +351,7 @@ func printString(format string, p Attribute, a ...interface{}) string {
 	c := getCachedColor(p)
 
 	if len(a) == 0 {
-		a = append(a, format)
-		format = "%s"
+		return c.SprintFunc()(format)
 	}
 
 	return c.SprintfFunc()(format, a...)
