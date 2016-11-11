@@ -69,7 +69,7 @@ set the output to color.Output:
     info := New(FgWhite, BgGreen).SprintFunc()
     fmt.Fprintf(color.Output, "this %s rocks!\n", info("package"))
 
-If print through different custom outputs is necessary, user can use fmt.FprintfXXX:
+If print through different custom outputs is necessary, user can use xColor.Fprintf:
 
     info := New(FgWhite, BgGreen)
     info.Fprintf(os.Stdout, "this %s rocks!\n", "package")
