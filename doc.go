@@ -61,13 +61,18 @@ Or create SprintXxx functions to mix strings with other non-colorized strings:
     fmt.Printf("this %s rocks!\n", info("package"))
 
 Windows support is enabled by default. All Print functions works as intended.
-However only for color.SprintXXX functions, user should use fmt.FprintXXX and
+However for color.SprintXXX functions, user should use fmt.FprintXXX and
 set the output to color.Output:
 
     fmt.Fprintf(color.Output, "Windows support: %s", color.GreenString("PASS"))
 
     info := New(FgWhite, BgGreen).SprintFunc()
     fmt.Fprintf(color.Output, "this %s rocks!\n", info("package"))
+
+If print through different custom outputs is necessary, user can use fmt.FprintfXXX:
+
+    info := New(FgWhite, BgGreen)
+    info.Fprintf(os.Stdout, "this %s rocks!\n", "package")
 
 Using with existing code is possible. Just use the Set() method to set the
 standard output to the given parameters. That way a rewrite of an existing
