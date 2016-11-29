@@ -184,20 +184,23 @@ func (c *Color) Println(a ...interface{}) (n int, err error) {
 	return fmt.Fprintln(Output, a...)
 }
 
-// PrintFunc returns a new function that prints the passed arguments as
-// colorized with color.Print().
+// PrintFunc returns a new function that prints the passed arguments
+// as colorized with color.Print(). PrintFunc is kept for backward
+// compatibility, new code should use func := c.Print instead.
 func (c *Color) PrintFunc() func(a ...interface{}) {
 	return func(a ...interface{}) { c.Print(a...) }
 }
 
-// PrintfFunc returns a new function that prints the passed arguments as
-// colorized with color.Printf().
+// PrintfFunc returns a new function that prints the passed arguments
+// as colorized with color.Printf(). PrintfFunc is kept for backward
+// compatibility, new code should use func := c.Printf instead.
 func (c *Color) PrintfFunc() func(format string, a ...interface{}) {
 	return func(format string, a ...interface{}) { c.Printf(format, a...) }
 }
 
-// PrintlnFunc returns a new function that prints the passed arguments as
-// colorized with color.Println().
+// PrintlnFunc returns a new function that prints the passed arguments
+// as colorized with color.Println(). PrintlnFunc is kept for backward
+// compatibility, new code should use func := c.Println instead.
 func (c *Color) PrintlnFunc() func(a ...interface{}) {
 	return func(a ...interface{}) { c.Println(a...) }
 }
