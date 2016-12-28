@@ -15,7 +15,7 @@ import (
 // false or true based on the stdout's file descriptor referring to a terminal
 // or not. This is a global option and affects all colors. For more control
 // over each color block use the methods DisableColor() individually.
-var NoColor = !isatty.IsTerminal(os.Stdout.Fd())
+var NoColor = !isatty.IsTerminal(os.Stdout.Fd()) || os.Getenv("TERM") == "dumb"
 
 // Color defines a custom color object which is defined by SGR parameters.
 type Color struct {
