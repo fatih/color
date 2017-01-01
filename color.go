@@ -2,6 +2,7 @@ package color
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -162,14 +163,23 @@ func (c *Color) Print(a ...interface{}) (n int, err error) {
 	return fmt.Fprint(Output, a...)
 }
 
+// Fprintf formats using the default formats for its operands and writes to the output.
+// Spaces are added between operands when neither is a
+// string. It returns the number of bytes written and any write error
+// encountered. This is the standard fmt.Fprintf() method wrapped with the given
+// color.
+func (c *Color) Fprintf(output io.Writer, format string, a ...interface{}) (n int, err error) {
+	c.Set()
+	defer c.unset()
+
+	return fmt.Fprintf(output, format, a...)
+}
+
 // Printf formats according to a format specifier and writes to standard output.
 // It returns the number of bytes written and any write error encountered.
 // This is the standard fmt.Printf() method wrapped with the given color.
 func (c *Color) Printf(format string, a ...interface{}) (n int, err error) {
-	c.Set()
-	defer c.unset()
-
-	return fmt.Fprintf(Output, format, a...)
+	return c.Fprintf(Output, format, a...)
 }
 
 // Println formats using the default formats for its operands and writes to
@@ -188,6 +198,12 @@ func (c *Color) Println(a ...interface{}) (n int, err error) {
 // colorized with color.Print().
 func (c *Color) PrintFunc() func(a ...interface{}) {
 	return func(a ...interface{}) { c.Print(a...) }
+}
+
+// FprintfFunc returns a new function that prints the passed arguments as
+// colorized with color.Fprintf().
+func (c *Color) FprintfFunc() func(output io.Writer, format string, a ...interface{}) {
+	return func(output io.Writer, format string, a ...interface{}) { c.Fprintf(output, format, a...) }
 }
 
 // PrintfFunc returns a new function that prints the passed arguments as

@@ -204,6 +204,10 @@ func TestColorVisual(t *testing.T) {
 	red := New(FgRed).PrintfFunc()
 	red("red text with a printf func: %d\n", 123)
 
+	green := New(FgGreen).FprintfFunc()
+	// ** Windows works too both os.Stdout & color.Output **
+	green(Output, "green text with a fprintf func: %d\n", 123)
+
 	put := New(FgYellow).SprintFunc()
 	warn := New(FgRed).SprintFunc()
 

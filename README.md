@@ -69,6 +69,19 @@ notice := color.New(color.Bold, color.FgGreen).PrintlnFunc()
 notice("Don't forget this...")
 ```
 
+**Fprintf**
+
+```go
+// Declare any custom output (io.Writer)
+var myOut = os.Stdout
+
+// Create a custom fprintf function for convenience
+green := color.New(color.FgGreen).FprintfFunc()
+green(myOut, "Info")
+green(myOut, "INFO: %s", msg)
+```
+
+
 ### Insert into noncolor strings (SprintFunc)
 
 ```go
@@ -151,4 +164,3 @@ c.Println("This prints again cyan...")
 ## License
 
 The MIT License (MIT) - see [`LICENSE.md`](https://github.com/fatih/color/blob/master/LICENSE.md) for more details
-
