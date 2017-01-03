@@ -3,6 +3,7 @@ package color
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/mattn/go-colorable"
@@ -211,6 +212,9 @@ func TestColorVisual(t *testing.T) {
 
 	info := New(FgWhite, BgGreen).SprintFunc()
 	fmt.Fprintf(Output, "this %s rocks!\n", info("package"))
+
+	notice := New(FgBlue).FprintFunc()
+	notice(os.Stderr, "just a blue notice to stderr")
 
 	// Fifth Visual Test
 	fmt.Println()
