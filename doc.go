@@ -57,7 +57,7 @@ You can create PrintXxx functions to simplify even more:
 You can also FprintXxx functions to pass your own io.Writer:
 
     blue := color.New(FgBlue).FprintfFunc()
-	blue(myWriter, "important notice: %s", stars)
+    blue(myWriter, "important notice: %s", stars)
 
     // Mix up with multiple attributes
     success := color.New(color.Bold, color.FgGreen).FprintlnFunc()
