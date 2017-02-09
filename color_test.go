@@ -54,6 +54,19 @@ func TestColor(t *testing.T) {
 			t.Errorf("Expecting %s, got '%s'\n", escapedForm, scannedLine)
 		}
 	}
+
+	for _, c := range testColors {
+		line := New(c.code).Sprintf("%s", c.text)
+		scannedLine := fmt.Sprintf("%q", line)
+		colored := fmt.Sprintf("\x1b[%dm%s\x1b[0m", c.code, c.text)
+		escapedForm := fmt.Sprintf("%q", colored)
+
+		fmt.Printf("%s\t: %s\n", c.text, line)
+
+		if scannedLine != escapedForm {
+			t.Errorf("Expecting %s, got '%s'\n", escapedForm, scannedLine)
+		}
+	}
 }
 
 func TestColorEquals(t *testing.T) {
