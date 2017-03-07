@@ -13,7 +13,7 @@
 			"importpath": "github.com/mattn/go-isatty",
 			"repository": "https://github.com/mattn/go-isatty",
 			"vcs": "git",
-			"revision": "dda3de49cbfcec471bd7a70e6cc01fcc3ff90109",
+			"revision": "57fdcb988a5c543893cc61bce354a6e24ab70022",
 			"branch": "master",
 			"notests": true
 		},
