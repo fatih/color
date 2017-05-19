@@ -199,6 +199,14 @@ func TestColorVisual(t *testing.T) {
 	Magenta("magenta")
 	Cyan("cyan")
 	White("white")
+	HiBlack("hblack")
+	HiRed("hred")
+	HiGreen("hgreen")
+	HiYellow("hyellow")
+	HiBlue("hblue")
+	HiMagenta("hmagenta")
+	HiCyan("hcyan")
+	HiWhite("hwhite")
 
 	// Third visual test
 	fmt.Println()
@@ -266,6 +274,30 @@ func TestNoFormat(t *testing.T) {
 
 	fmt.Printf("%s   %%s = ", WhiteString("White"))
 	White("%s")
+
+	fmt.Printf("%s   %%s = ", HiBlackString("HiBlack"))
+	HiBlack("%s")
+
+	fmt.Printf("%s     %%s = ", HiRedString("HiRed"))
+	HiRed("%s")
+
+	fmt.Printf("%s   %%s = ", HiGreenString("HiGreen"))
+	HiGreen("%s")
+
+	fmt.Printf("%s  %%s = ", HiYellowString("HiYellow"))
+	HiYellow("%s")
+
+	fmt.Printf("%s    %%s = ", HiBlueString("HiBlue"))
+	HiBlue("%s")
+
+	fmt.Printf("%s %%s = ", HiMagentaString("HiMagenta"))
+	HiMagenta("%s")
+
+	fmt.Printf("%s    %%s = ", HiCyanString("HiCyan"))
+	HiCyan("%s")
+
+	fmt.Printf("%s   %%s = ", HiWhiteString("HiWhite"))
+	HiWhite("%s")
 }
 
 func TestNoFormatString(t *testing.T) {
