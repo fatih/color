@@ -199,6 +199,14 @@ func TestColorVisual(t *testing.T) {
 	Magenta("magenta")
 	Cyan("cyan")
 	White("white")
+	HiBlack("hblack")
+	HiRed("hred")
+	HiGreen("hgreen")
+	HiYellow("hyellow")
+	HiBlue("hblue")
+	HiMagenta("hmagenta")
+	HiCyan("hcyan")
+	HiWhite("hwhite")
 
 	// Third visual test
 	fmt.Println()
@@ -240,6 +248,14 @@ func TestColorVisual(t *testing.T) {
 	fmt.Fprintln(Output, MagentaString("magenta"))
 	fmt.Fprintln(Output, CyanString("cyan"))
 	fmt.Fprintln(Output, WhiteString("white"))
+	fmt.Fprintln(Output, HiBlackString("hblack"))
+	fmt.Fprintln(Output, HiRedString("hred"))
+	fmt.Fprintln(Output, HiGreenString("hgreen"))
+	fmt.Fprintln(Output, HiYellowString("hyellow"))
+	fmt.Fprintln(Output, HiBlueString("hblue"))
+	fmt.Fprintln(Output, HiMagentaString("hmagenta"))
+	fmt.Fprintln(Output, HiCyanString("hcyan"))
+	fmt.Fprintln(Output, HiWhiteString("hwhite"))
 }
 
 func TestNoFormat(t *testing.T) {
@@ -266,6 +282,30 @@ func TestNoFormat(t *testing.T) {
 
 	fmt.Printf("%s   %%s = ", WhiteString("White"))
 	White("%s")
+
+	fmt.Printf("%s   %%s = ", HiBlackString("HiBlack"))
+	HiBlack("%s")
+
+	fmt.Printf("%s     %%s = ", HiRedString("HiRed"))
+	HiRed("%s")
+
+	fmt.Printf("%s   %%s = ", HiGreenString("HiGreen"))
+	HiGreen("%s")
+
+	fmt.Printf("%s  %%s = ", HiYellowString("HiYellow"))
+	HiYellow("%s")
+
+	fmt.Printf("%s    %%s = ", HiBlueString("HiBlue"))
+	HiBlue("%s")
+
+	fmt.Printf("%s %%s = ", HiMagentaString("HiMagenta"))
+	HiMagenta("%s")
+
+	fmt.Printf("%s    %%s = ", HiCyanString("HiCyan"))
+	HiCyan("%s")
+
+	fmt.Printf("%s   %%s = ", HiWhiteString("HiWhite"))
+	HiWhite("%s")
 }
 
 func TestNoFormatString(t *testing.T) {
@@ -283,6 +323,14 @@ func TestNoFormatString(t *testing.T) {
 		{MagentaString, "%s", nil, "\x1b[35m%s\x1b[0m"},
 		{CyanString, "%s", nil, "\x1b[36m%s\x1b[0m"},
 		{WhiteString, "%s", nil, "\x1b[37m%s\x1b[0m"},
+		{HiBlackString, "%s", nil, "\x1b[90m%s\x1b[0m"},
+		{HiRedString, "%s", nil, "\x1b[91m%s\x1b[0m"},
+		{HiGreenString, "%s", nil, "\x1b[92m%s\x1b[0m"},
+		{HiYellowString, "%s", nil, "\x1b[93m%s\x1b[0m"},
+		{HiBlueString, "%s", nil, "\x1b[94m%s\x1b[0m"},
+		{HiMagentaString, "%s", nil, "\x1b[95m%s\x1b[0m"},
+		{HiCyanString, "%s", nil, "\x1b[96m%s\x1b[0m"},
+		{HiWhiteString, "%s", nil, "\x1b[97m%s\x1b[0m"},
 	}
 
 	for i, test := range tests {
