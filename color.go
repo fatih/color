@@ -265,9 +265,9 @@ func (c *Color) Sprintf(format string, a ...interface{}) string {
 
 // FprintFunc returns a new function that prints the passed arguments as
 // colorized with color.Fprint().
-func (c *Color) FprintFunc() func(w io.Writer, a ...interface{}) {
-	return func(w io.Writer, a ...interface{}) {
-		c.Fprint(w, a...)
+func (c *Color) FprintFunc() func(w io.Writer, a ...interface{}) (n int, err error) {
+	return func(w io.Writer, a ...interface{}) (n int, err error) {
+		return c.Fprint(w, a...)
 	}
 }
 
