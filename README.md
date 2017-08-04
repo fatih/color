@@ -163,7 +163,6 @@ c.Println("This prints again cyan...")
 ## Todo
 
 * Save/Return previous values
-* Evaluate fmt.Formatter interface
 
 
 ## Credits

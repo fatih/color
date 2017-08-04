@@ -34,6 +34,7 @@ var (
 type Color struct {
 	params  []Attribute
 	noColor *bool
+	colored string
 }
 
 // Attribute defines a single SGR Code
@@ -263,6 +264,26 @@ func (c *Color) Sprintf(format string, a ...interface{}) string {
 	return c.wrap(fmt.Sprintf(format, a...))
 }
 
+// FormatPrint is just like Sprint, but instead of string, returns a formattable
+// object.
+func (c *Color) FormatPrint(a ...interface{}) fmt.Formatter {
+	c.colored = fmt.Sprint(a...)
+	return c
+}
+
+// FormatPrintln is just like Sprintln, but instead of string, returns a
+// formattable object.
+func (c *Color) FormatPrintln(a ...interface{}) fmt.Formatter {
+	c.colored = fmt.Sprintln(a...)
+	return c
+}
+
+// FormatPrintf is just like Printf, but returns a string instead of printing it.
+func (c *Color) FormatPrintf(format string, a ...interface{}) fmt.Formatter {
+	c.colored = fmt.Sprintf(format, a...)
+	return c
+}
+
 // FprintFunc returns a new function that prints the passed arguments as
 // colorized with color.Fprint().
 func (c *Color) FprintFunc() func(w io.Writer, a ...interface{}) {
@@ -313,7 +334,8 @@ func (c *Color) PrintlnFunc() func(a ...interface{}) {
 
 // SprintFunc returns a new function that returns colorized strings for the
 // given arguments with fmt.Sprint(). Useful to put into or mix into other
-// string. Windows users should use this in conjunction with color.Output, example:
+// string. Windows users should use this in conjunction with color.Output,
+// example:
 //
 //	put := New(FgYellow).SprintFunc()
 //	fmt.Fprintf(color.Output, "This is a %s", put("warning"))
@@ -338,6 +360,51 @@ func (c *Color) SprintfFunc() func(format string, a ...interface{}) string {
 func (c *Color) SprintlnFunc() func(a ...interface{}) string {
 	return func(a ...interface{}) string {
 		return c.wrap(fmt.Sprintln(a...))
+	}
+}
+
+// FormatFunc returns a new function that returns colorized strings for the
+// given arguments with fmt.Sprint(), that can further be used with
+// fmt.* functions. example:
+//
+//	put := New(FgYellow).FormatFunc()
+//  colored := put("apple", 10)
+//	fmt.Fprintf(color.Output, "can do additional formatting on %-10s", colored)
+func (c *Color) FormatFunc() func(a ...interface{}) fmt.Formatter {
+	return func(a ...interface{}) fmt.Formatter {
+		newc := *c
+		newc.colored = fmt.Sprint(a...)
+		return &newc
+	}
+}
+
+// FormatfFunc returns a new function that returns colorized strings for the
+// given arguments with fmt.Sprintf(), that can further be used with
+// fmt.* functions. example:
+//
+//	put := New(FgYellow).FormatfFunc()
+//  colored := put("[%v,%v] are all in yellow", "apple", 10)
+//	fmt.Fprintf(color.Output, "can do additional formatting on %-10s", colored)
+func (c *Color) FormatfFunc() func(fm string, a ...interface{}) fmt.Formatter {
+	return func(fm string, a ...interface{}) fmt.Formatter {
+		newc := *c
+		newc.colored = fmt.Sprintf(fm, a...)
+		return &newc
+	}
+}
+
+// FormatlnFunc returns a new function that returns colorized strings for the
+// given arguments with fmt.Sprintln(), that can further be used with
+// fmt.* functions. example:
+//
+//	put := New(FgYellow).FormatlnFunc()
+//  colored := put("apple", 10)
+//	fmt.Fprintf(color.Output, "can do additional formatting on %-10s", colored)
+func (c *Color) FormatlnFunc() func(a ...interface{}) fmt.Formatter {
+	return func(a ...interface{}) fmt.Formatter {
+		newc := *c
+		newc.colored = fmt.Sprintln(a...)
+		return &newc
 	}
 }
 
@@ -597,4 +664,27 @@ func HiCyanString(format string, a ...interface{}) string { return colorString(f
 // foreground.
 func HiWhiteString(format string, a ...interface{}) string {
 	return colorString(format, FgHiWhite, a...)
+}
+
+// Format implements fmt.Formatter interface.
+func (c *Color) Format(f fmt.State, ch rune) {
+	var scratch [16]byte
+
+	format := "%"
+	for _, flag := range []string{"+", "-", "#", " ", "0"} {
+		if f.Flag(int(flag[0])) {
+			format += flag
+		}
+	}
+	w, ok := f.Width()
+	if ok {
+		format += string(strconv.AppendInt(scratch[:0], int64(w), 10))
+	}
+	p, ok := f.Precision()
+	if ok {
+		format += "."
+		format += string(strconv.AppendInt(scratch[:0], int64(p), 10))
+	}
+	format += fmt.Sprintf("%c", ch)
+	fmt.Fprintf(f, c.wrap(fmt.Sprintf(format, c.colored)))
 }
