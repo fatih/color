@@ -129,13 +129,15 @@ defer color.Unset() // Use it in your function
 fmt.Println("All text will now be bold magenta.")
 ```
 
-### Disable color
+### Disable/Enable color
+ 
+There might be a case where you want to explicitly disable/enable color output. the 
+`go-isatty` package will automatically disable color output for non-tty output streams 
+(for example if the output were piped directly to `less`)
 
-There might be a case where you want to disable color output (for example to
-pipe the standard output of your app to somewhere else). `Color` has support to
-disable colors both globally and for single color definition. For example
-suppose you have a CLI app and a `--no-color` bool flag. You can easily disable
-the color output with:
+`Color` has support to disable/enable colors both globally and for single color 
+definitions. For example suppose you have a CLI app and a `--no-color` bool flag. You 
+can easily disable the color output with:
 
 ```go
 
