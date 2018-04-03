@@ -30,6 +30,13 @@ var (
 	colorsCacheMu sync.Mutex // protects colorsCache
 )
 
+func init() {
+	// Respect NO_COLOR, see http://no-color.org/
+	if _, noColor := os.LookupEnv("NO_COLOR"); noColor {
+		NoColor = true
+	}
+}
+
 // Color defines a custom color object which is defined by SGR parameters.
 type Color struct {
 	params  []Attribute
