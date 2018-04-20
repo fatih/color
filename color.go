@@ -423,6 +423,10 @@ func boolPtr(v bool) *bool {
 }
 
 func getCachedColor(p Attribute) *Color {
+	if c, ok := colorsCache[p]; ok {
+		return c
+	}
+
 	colorsCacheMu.Lock()
 	defer colorsCacheMu.Unlock()
 
