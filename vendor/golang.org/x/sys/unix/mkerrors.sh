@@ -189,6 +189,7 @@ struct ltchars {
 #include <linux/genetlink.h>
 #include <linux/stat.h>
 #include <linux/watchdog.h>
+#include <linux/hdreg.h>
 #include <net/route.h>
 #include <asm/termbits.h>
 
@@ -364,6 +365,7 @@ ccflags="$@"
 		$2 ~ /^IGN/ ||
 		$2 ~ /^IX(ON|ANY|OFF)$/ ||
 		$2 ~ /^IN(LCR|PCK)$/ ||
+		$2 !~ "X86_CR3_PCID_NOFLUSH" &&
 		$2 ~ /(^FLU?SH)|(FLU?SH$)/ ||
 		$2 ~ /^C(LOCAL|READ|MSPAR|RTSCTS)$/ ||
 		$2 == "BRKINT" ||
@@ -435,6 +437,7 @@ ccflags="$@"
 		$2 ~ /^ATTR_(BIT_MAP_COUNT|(CMN|VOL|FILE)_)/ ||
 		$2 ~ /^FSOPT_/ ||
 		$2 ~ /^WDIOC_/ ||
+		$2 ~ /^(HDIO|WIN|SMART)_/ ||
 		$2 !~ "WMESGLEN" &&
 		$2 ~ /^W[A-Z0-9]+$/ ||
 		$2 ~ /^BLK[A-Z]*(GET$|SET$|BUF$|PART$|SIZE)/ {printf("\t%s = C.%s\n", $2, $2)}
