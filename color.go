@@ -17,8 +17,9 @@ var (
 	// false or true based on the stdout's file descriptor referring to a terminal
 	// or not. This is a global option and affects all colors. For more control
 	// over each color block use the methods DisableColor() individually.
-	NoColor = os.Getenv("TERM") == "dumb" ||
-		(!isatty.IsTerminal(os.Stdout.Fd()) && !isatty.IsCygwinTerminal(os.Stdout.Fd()))
+	NoColor = os.Getenv("FORCE_ENABLE_COLOR") != "1" &&
+		(os.Getenv("TERM") == "dumb" ||
+			(!isatty.IsTerminal(os.Stdout.Fd()) && !isatty.IsCygwinTerminal(os.Stdout.Fd())))
 
 	// Output defines the standard output of the print functions. By default
 	// os.Stdout is used.
