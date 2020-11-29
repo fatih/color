@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -43,6 +44,42 @@ type Color struct {
 type Attribute int
 
 const escape = "\x1b"
+
+// colorMap contains rich text identifier for color based formatting
+var colorMap = map[string]Attribute{
+	"fg:black":     FgBlack,
+	"fg:red":       FgRed,
+	"fg:green":     FgGreen,
+	"fg:yellow":    FgYellow,
+	"fg:blue":      FgBlue,
+	"fg:magenta":   FgMagenta,
+	"fg:cyan":      FgCyan,
+	"fg:white":     FgWhite,
+	"fg:hiblack":   FgHiBlack,
+	"fg:hired":     FgHiRed,
+	"fg:higreen":   FgHiGreen,
+	"fg:hiyellow":  FgHiYellow,
+	"fg:hiblue":    FgHiBlue,
+	"fg:himagenta": FgHiMagenta,
+	"fg:hicyan":    FgHiCyan,
+	"fg:hiwhite":   FgHiWhite,
+	"bg:black":     BgBlack,
+	"bg:red":       BgRed,
+	"bg:green":     BgGreen,
+	"bg:yellow":    BgYellow,
+	"bg:blue":      BgBlue,
+	"bg:magenta":   BgMagenta,
+	"bg:cyan":      BgCyan,
+	"bg:white":     BgWhite,
+	"bg:hiblack":   BgHiBlack,
+	"bg:hired":     BgHiRed,
+	"bg:higreen":   BgHiGreen,
+	"bg:hiyellow":  BgHiYellow,
+	"bg:hiblue":    BgHiBlue,
+	"bg:himagenta": BgHiMagenta,
+	"bg:hicyan":    BgHiCyan,
+	"bg:hiwhite":   BgHiWhite,
+}
 
 // Base attributes
 const (
@@ -195,6 +232,16 @@ func (c *Color) Fprint(w io.Writer, a ...interface{}) (n int, err error) {
 	return fmt.Fprint(w, a...)
 }
 
+// FprintRT formats using the default formats for its operands and writes to w.
+// Spaces are added between operands when neither is a string.
+// It returns the number of bytes written and any write error encountered.
+// On Windows, users should wrap w with colorable.NewColorable() if w is of
+// type *os.File.
+func (c *Color) FprintRT(w io.Writer, a ...interface{}) (n int, err error) {
+	s := fmt.Sprint(a...)
+	return fmt.Fprint(w, c.wrapRichText(s))
+}
+
 // Print formats using the default formats for its operands and writes to
 // standard output. Spaces are added between operands when neither is a
 // string. It returns the number of bytes written and any write error
@@ -205,6 +252,16 @@ func (c *Color) Print(a ...interface{}) (n int, err error) {
 	defer c.unset()
 
 	return fmt.Fprint(Output, a...)
+}
+
+// PrintRT formats using the default formats for its operands and writes to
+// standard output. Spaces are added between operands when neither is a
+// string. It returns the number of bytes written and any write error
+// encountered. This is the standard fmt.Print() method wrapped with the given
+// color.
+func (c *Color) PrintRT(a ...interface{}) (n int, err error) {
+	s := fmt.Sprint(a...)
+	return fmt.Fprint(Output, c.wrapRichText(s))
 }
 
 // Fprintf formats according to a format specifier and writes to w.
@@ -218,6 +275,14 @@ func (c *Color) Fprintf(w io.Writer, format string, a ...interface{}) (n int, er
 	return fmt.Fprintf(w, format, a...)
 }
 
+// FprintfRT formats according to a format specifier and writes to w.
+// It returns the number of bytes written and any write error encountered.
+// On Windows, users should wrap w with colorable.NewColorable() if w is of
+// type *os.File.
+func (c *Color) FprintfRT(w io.Writer, format string, a ...interface{}) (n int, err error) {
+	return fmt.Fprintf(w, c.wrapRichText(format), a...)
+}
+
 // Printf formats according to a format specifier and writes to standard output.
 // It returns the number of bytes written and any write error encountered.
 // This is the standard fmt.Printf() method wrapped with the given color.
@@ -226,6 +291,13 @@ func (c *Color) Printf(format string, a ...interface{}) (n int, err error) {
 	defer c.unset()
 
 	return fmt.Fprintf(Output, format, a...)
+}
+
+// PrintfRT formats according to a format specifier and writes to standard output.
+// It returns the number of bytes written and any write error encountered.
+// This is the standard fmt.Printf() method wrapped with the given color.
+func (c *Color) PrintfRT(format string, a ...interface{}) (n int, err error) {
+	return fmt.Fprintf(Output, c.wrapRichText(format), a...)
 }
 
 // Fprintln formats using the default formats for its operands and writes to w.
@@ -237,6 +309,15 @@ func (c *Color) Fprintln(w io.Writer, a ...interface{}) (n int, err error) {
 	defer c.unsetWriter(w)
 
 	return fmt.Fprintln(w, a...)
+}
+
+// FprintlnRT formats using the default formats for its operands and writes to w.
+// Spaces are always added between operands and a newline is appended.
+// On Windows, users should wrap w with colorable.NewColorable() if w is of
+// type *os.File.
+func (c *Color) FprintlnRT(w io.Writer, a ...interface{}) (n int, err error) {
+	s := fmt.Sprint(a...)
+	return fmt.Fprintln(w, c.wrapRichText(s))
 }
 
 // Println formats using the default formats for its operands and writes to
@@ -251,9 +332,24 @@ func (c *Color) Println(a ...interface{}) (n int, err error) {
 	return fmt.Fprintln(Output, a...)
 }
 
+// PrintlnRT formats using the default formats for its operands and writes to
+// standard output. Spaces are always added between operands and a newline is
+// appended. It returns the number of bytes written and any write error
+// encountered. This is the standard fmt.Print() method wrapped with the given
+// color.
+func (c *Color) PrintlnRT(a ...interface{}) (n int, err error) {
+	s := fmt.Sprint(a...)
+	return fmt.Fprintln(Output, s)
+}
+
 // Sprint is just like Print, but returns a string instead of printing it.
 func (c *Color) Sprint(a ...interface{}) string {
 	return c.wrap(fmt.Sprint(a...))
+}
+
+// SprintRT is just like PrintRT, but returns a string instead of printing it.
+func (c *Color) SprintRT(a ...interface{}) string {
+	return c.wrapRichText(fmt.Sprint(a...))
 }
 
 // Sprintln is just like Println, but returns a string instead of printing it.
@@ -261,9 +357,19 @@ func (c *Color) Sprintln(a ...interface{}) string {
 	return c.wrap(fmt.Sprintln(a...))
 }
 
+// SprintlnRT is just like PrintlnRT, but returns a string instead of printing it.
+func (c *Color) SprintlnRT(a ...interface{}) string {
+	return c.wrapRichText(fmt.Sprintln(a...))
+}
+
 // Sprintf is just like Printf, but returns a string instead of printing it.
 func (c *Color) Sprintf(format string, a ...interface{}) string {
 	return c.wrap(fmt.Sprintf(format, a...))
+}
+
+// SprintfRT is just like PrintfRT, but returns a string instead of printing it.
+func (c *Color) SprintfRT(format string, a ...interface{}) string {
+	return c.wrapRichText(fmt.Sprintf(format, a...))
 }
 
 // FprintFunc returns a new function that prints the passed arguments as
@@ -274,11 +380,28 @@ func (c *Color) FprintFunc() func(w io.Writer, a ...interface{}) {
 	}
 }
 
+// FprintRTFunc returns a new function that prints the passed arguments as
+// colorized with color.FprintRT().
+func (c *Color) FprintRTFunc() func(w io.Writer, a ...interface{}) {
+	return func(w io.Writer, a ...interface{}) {
+		c.FprintRT(w, a...)
+	}
+}
+
+
 // PrintFunc returns a new function that prints the passed arguments as
 // colorized with color.Print().
 func (c *Color) PrintFunc() func(a ...interface{}) {
 	return func(a ...interface{}) {
 		c.Print(a...)
+	}
+}
+
+// PrintRTFunc returns a new function that prints the passed arguments as
+// colorized with color.PrintRT().
+func (c *Color) PrintRTFunc() func(a ...interface{}) {
+	return func(a ...interface{}) {
+		c.PrintRT(a...)
 	}
 }
 
@@ -290,6 +413,14 @@ func (c *Color) FprintfFunc() func(w io.Writer, format string, a ...interface{})
 	}
 }
 
+// FprintfRTFunc returns a new function that prints the passed arguments as
+// colorized with color.FprintfRT().
+func (c *Color) FprintfRTFunc() func(w io.Writer, format string, a ...interface{}) {
+	return func(w io.Writer, format string, a ...interface{}) {
+		c.FprintfRT(w, format, a...)
+	}
+}
+
 // PrintfFunc returns a new function that prints the passed arguments as
 // colorized with color.Printf().
 func (c *Color) PrintfFunc() func(format string, a ...interface{}) {
@@ -297,6 +428,15 @@ func (c *Color) PrintfFunc() func(format string, a ...interface{}) {
 		c.Printf(format, a...)
 	}
 }
+
+// PrintfRTFunc returns a new function that prints the passed arguments as
+// colorized with color.PrintfRT().
+func (c *Color) PrintfRTFunc() func(format string, a ...interface{}) {
+	return func(format string, a ...interface{}) {
+		c.PrintfRT(format, a...)
+	}
+}
+
 
 // FprintlnFunc returns a new function that prints the passed arguments as
 // colorized with color.Fprintln().
@@ -306,11 +446,27 @@ func (c *Color) FprintlnFunc() func(w io.Writer, a ...interface{}) {
 	}
 }
 
+// FprintlnRTFunc returns a new function that prints the passed arguments as
+// colorized with color.FprintlnRT().
+func (c *Color) FprintlnRTFunc() func(w io.Writer, a ...interface{}) {
+	return func(w io.Writer, a ...interface{}) {
+		c.FprintlnRT(w, a...)
+	}
+}
+
 // PrintlnFunc returns a new function that prints the passed arguments as
 // colorized with color.Println().
 func (c *Color) PrintlnFunc() func(a ...interface{}) {
 	return func(a ...interface{}) {
 		c.Println(a...)
+	}
+}
+
+// PrintlnRTFunc returns a new function that prints the passed arguments as
+// colorized with color.PrintlnRT().
+func (c *Color) PrintlnRTFunc() func(a ...interface{}) {
+	return func(a ...interface{}) {
+		c.PrintlnRT(a...)
 	}
 }
 
@@ -326,12 +482,33 @@ func (c *Color) SprintFunc() func(a ...interface{}) string {
 	}
 }
 
+// SprintRTFunc returns a new function that returns colorized strings for the
+// given arguments with fmt.Sprint(). Useful to put into or mix into other
+// string. Windows users should use this in conjunction with color.Output, example:
+//
+//	put := New().SprintRTFunc()
+//	fmt.Fprintf(color.Output, "This is a %s", put("warning"))
+func (c *Color) SprintRTFunc() func(a ...interface{}) string {
+	return func(a ...interface{}) string {
+		return c.wrapRichText(fmt.Sprint(a...))
+	}
+}
+
 // SprintfFunc returns a new function that returns colorized strings for the
 // given arguments with fmt.Sprintf(). Useful to put into or mix into other
 // string. Windows users should use this in conjunction with color.Output.
 func (c *Color) SprintfFunc() func(format string, a ...interface{}) string {
 	return func(format string, a ...interface{}) string {
 		return c.wrap(fmt.Sprintf(format, a...))
+	}
+}
+
+// SprintfRTFunc returns a new function that returns colorized strings for the
+// given arguments with fmt.Sprintf(). Useful to put into or mix into other
+// string. Windows users should use this in conjunction with color.Output.
+func (c *Color) SprintfRTFunc() func(format string, a ...interface{}) string {
+	return func(format string, a ...interface{}) string {
+		return c.wrapRichText(fmt.Sprintf(format, a...))
 	}
 }
 
@@ -344,15 +521,58 @@ func (c *Color) SprintlnFunc() func(a ...interface{}) string {
 	}
 }
 
+// SprintlnRTFunc returns a new function that returns colorized strings for the
+// given arguments with fmt.Sprintln(). Useful to put into or mix into other
+// string. Windows users should use this in conjunction with color.Output.
+func (c *Color) SprintlnRTFunc() func(a ...interface{}) string {
+	return func(a ...interface{}) string {
+		return c.wrapRichText(fmt.Sprintln(a...))
+	}
+}
+
 // sequence returns a formatted SGR sequence to be plugged into a "\x1b[...m"
 // an example output might be: "1;36" -> bold cyan
 func (c *Color) sequence() string {
-	format := make([]string, len(c.params))
+	return c.sequenceWithParams(c.params...)
+}
+
+// sequenceWithParams returns a formatted SGR sequence to be plugged into a "\x1b[...m"
+// an example output might be: "1;36" -> bold cyan
+func (c *Color) sequenceWithParams(params ...Attribute) string {
+	format := make([]string, len(params))
 	for i, v := range c.params {
 		format[i] = strconv.Itoa(int(v))
 	}
 
 	return strings.Join(format, ";")
+}
+
+// wrapRichText wraps the s string with the colors attributes. The string is ready to
+// be printed.
+func (c *Color) wrapRichText(s string) (str string) {
+	if c.isNoColorSet() {
+		return s
+	}
+	var re *regexp.Regexp
+
+	// process bold format
+	re = regexp.MustCompile("\\*([^*]+)\\*")
+	str = re.ReplaceAllString(s, BoldString("$1"))
+
+	// process italic format
+	re = regexp.MustCompile("_([^_]+)_")
+	str = re.ReplaceAllString(str, ItalicString("$1"))
+
+	// process underline format
+	re = regexp.MustCompile("~([^~]+)~")
+	str = re.ReplaceAllString(str, UnderlineString("$1"))
+
+	//process colors format
+	for key, value := range colorMap {
+		re = regexp.MustCompile(fmt.Sprintf("(?i)\\(%s\\|(.+)\\)", key))
+		str = re.ReplaceAllString(str, colorString("$1", value))
+	}
+	return
 }
 
 // wrap wraps the s string with the colors attributes. The string is ready to
@@ -497,6 +717,18 @@ func White(format string, a ...interface{}) { colorPrint(format, FgWhite, a...) 
 // BlackString is a convenient helper function to return a string with black
 // foreground.
 func BlackString(format string, a ...interface{}) string { return colorString(format, FgBlack, a...) }
+
+// BoldString is a convenient helper function to return a string with bold
+// font.
+func BoldString(format string, a ...interface{}) string { return colorString(format, Bold, a...) }
+
+// UnderlineString is a convenient helper function to return a string with underline
+func UnderlineString(format string, a ...interface{}) string {
+	return colorString(format, Underline, a...)
+}
+
+// ItalicString is a convenient helper function to return a string in italics
+func ItalicString(format string, a ...interface{}) string { return colorString(format, Italic, a...) }
 
 // RedString is a convenient helper function to return a string with red
 // foreground.
