@@ -340,3 +340,13 @@ func TestNoFormatString(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkGetCachedColor(b *testing.B) {
+	var c *Color
+	for i := 0; i < b.N; i++ {
+		c = getCachedColor(FgBlack)
+	}
+	if !c.attrExists(FgBlack) {
+		b.Fail()
+	}
+}
