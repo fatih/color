@@ -145,7 +145,7 @@ const (
 
 // New returns a newly created color object.
 func New(value ...Attribute) *Color {
-	c := &Color{params: make([]Attribute, 0)}
+	c := &Color{params: make([]Attribute, 0, len(value))}
 	c.Add(value...)
 	return c
 }
@@ -215,9 +215,7 @@ func (c *Color) Add(value ...Attribute) *Color {
 }
 
 func (c *Color) prepend(value Attribute) {
-	c.params = append(c.params, 0)
-	copy(c.params[1:], c.params[0:])
-	c.params[0] = value
+	c.params = append([]Attribute{value}, c.params...)
 }
 
 // Fprint formats using the default formats for its operands and writes to w.
@@ -477,9 +475,7 @@ func (c *Color) PrintlnRTFunc() func(a ...interface{}) {
 //	put := New(FgYellow).SprintFunc()
 //	fmt.Fprintf(color.Output, "This is a %s", put("warning"))
 func (c *Color) SprintFunc() func(a ...interface{}) string {
-	return func(a ...interface{}) string {
-		return c.wrap(fmt.Sprint(a...))
-	}
+	return c.Sprint
 }
 
 // SprintRTFunc returns a new function that returns colorized strings for the
@@ -498,9 +494,7 @@ func (c *Color) SprintRTFunc() func(a ...interface{}) string {
 // given arguments with fmt.Sprintf(). Useful to put into or mix into other
 // string. Windows users should use this in conjunction with color.Output.
 func (c *Color) SprintfFunc() func(format string, a ...interface{}) string {
-	return func(format string, a ...interface{}) string {
-		return c.wrap(fmt.Sprintf(format, a...))
-	}
+	return c.Sprintf
 }
 
 // SprintfRTFunc returns a new function that returns colorized strings for the
@@ -516,9 +510,7 @@ func (c *Color) SprintfRTFunc() func(format string, a ...interface{}) string {
 // given arguments with fmt.Sprintln(). Useful to put into or mix into other
 // string. Windows users should use this in conjunction with color.Output.
 func (c *Color) SprintlnFunc() func(a ...interface{}) string {
-	return func(a ...interface{}) string {
-		return c.wrap(fmt.Sprintln(a...))
-	}
+	return c.Sprintln
 }
 
 // SprintlnRTFunc returns a new function that returns colorized strings for the
@@ -539,12 +531,17 @@ func (c *Color) sequence() string {
 // sequenceWithParams returns a formatted SGR sequence to be plugged into a "\x1b[...m"
 // an example output might be: "1;36" -> bold cyan
 func (c *Color) sequenceWithParams(params ...Attribute) string {
-	format := make([]string, len(params))
-	for i, v := range c.params {
-		format[i] = strconv.Itoa(int(v))
+	if len(c.params) == 0 {
+		return ""
 	}
-
-	return strings.Join(format, ";")
+	var sb strings.Builder
+	for i, v := range c.params {
+		if i > 0 {
+			sb.WriteRune(';')
+		}
+		sb.WriteString(strconv.Itoa(int(v)))
+	}
+	return sb.String()
 }
 
 // wrapRichText wraps the s string with the colors attributes. The string is ready to
@@ -676,10 +673,10 @@ func colorString(format string, p Attribute, a ...interface{}) string {
 	c := getCachedColor(p)
 
 	if len(a) == 0 {
-		return c.SprintFunc()(format)
+		return c.Sprint(format)
 	}
 
-	return c.SprintfFunc()(format, a...)
+	return c.Sprintf(format, a...)
 }
 
 // Black is a convenient helper function to print with black foreground. A
