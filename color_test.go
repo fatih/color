@@ -346,6 +346,12 @@ func TestColor_RichTextProcessor(t *testing.T) {
 
 	mixed("This is the example of *Rich Text Formatting* in the ~terminal~. (fg:black|(bg:cyan|BLACK text on a CYAN background)).\n")
 
+	clr := New()
+
+	clr.PrintlnRT("This is a *bold text*, an _italic text_, an ~underlined text~, a (fg:red|red string) and a (bg:blue|blue background)")
+	clr.PrintfRT("Links: (fg:blue|~%s~)", "https://github.com/iambenkay\n")
+	clr.PrintfRT("Messages: (fg:red|*%s*)", "WARNING\n")
+
 	getRichString := New().SprintRTFunc()
 
 	tests := []struct {
@@ -357,6 +363,7 @@ func TestColor_RichTextProcessor(t *testing.T) {
 		{"This is ~underlined~", "This is \x1b[4munderlined\x1b[0m"},
 		{"This is (fg:red|red text)", "This is \x1b[31mred text\x1b[0m"},
 		{"This has a (bg:blue|blue background)", "This has a \x1b[44mblue background\x1b[0m"},
+		{"This shows (fg:red|(bg:blue|red text on a blue background))", "This shows \x1b[31;44mred text on a blue background\x1b[0m"},
 	}
 
 	for i, test := range tests {

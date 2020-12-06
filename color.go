@@ -337,7 +337,7 @@ func (c *Color) Println(a ...interface{}) (n int, err error) {
 // color.
 func (c *Color) PrintlnRT(a ...interface{}) (n int, err error) {
 	s := fmt.Sprint(a...)
-	return fmt.Fprintln(Output, s)
+	return fmt.Fprintln(Output, c.wrapRichText(s))
 }
 
 // Sprint is just like Print, but returns a string instead of printing it.
@@ -372,100 +372,74 @@ func (c *Color) SprintfRT(format string, a ...interface{}) string {
 
 // FprintFunc returns a new function that prints the passed arguments as
 // colorized with color.Fprint().
-func (c *Color) FprintFunc() func(w io.Writer, a ...interface{}) {
-	return func(w io.Writer, a ...interface{}) {
-		c.Fprint(w, a...)
-	}
+func (c *Color) FprintFunc() func(w io.Writer, a ...interface{}) (int, error) {
+	return c.Fprint
 }
 
 // FprintRTFunc returns a new function that prints the passed arguments as
 // colorized with color.FprintRT().
-func (c *Color) FprintRTFunc() func(w io.Writer, a ...interface{}) {
-	return func(w io.Writer, a ...interface{}) {
-		c.FprintRT(w, a...)
-	}
+func (c *Color) FprintRTFunc() func(w io.Writer, a ...interface{}) (int, error) {
+	return c.FprintRT
 }
-
 
 // PrintFunc returns a new function that prints the passed arguments as
 // colorized with color.Print().
-func (c *Color) PrintFunc() func(a ...interface{}) {
-	return func(a ...interface{}) {
-		c.Print(a...)
-	}
+func (c *Color) PrintFunc() func(a ...interface{}) (int, error) {
+	return c.Print
 }
 
 // PrintRTFunc returns a new function that prints the passed arguments as
 // colorized with color.PrintRT().
-func (c *Color) PrintRTFunc() func(a ...interface{}) {
-	return func(a ...interface{}) {
-		c.PrintRT(a...)
-	}
+func (c *Color) PrintRTFunc() func(a ...interface{}) (int, error) {
+	return c.PrintRT
 }
 
 // FprintfFunc returns a new function that prints the passed arguments as
 // colorized with color.Fprintf().
-func (c *Color) FprintfFunc() func(w io.Writer, format string, a ...interface{}) {
-	return func(w io.Writer, format string, a ...interface{}) {
-		c.Fprintf(w, format, a...)
-	}
+func (c *Color) FprintfFunc() func(w io.Writer, format string, a ...interface{}) (int, error) {
+	return c.Fprintf
 }
 
 // FprintfRTFunc returns a new function that prints the passed arguments as
 // colorized with color.FprintfRT().
-func (c *Color) FprintfRTFunc() func(w io.Writer, format string, a ...interface{}) {
-	return func(w io.Writer, format string, a ...interface{}) {
-		c.FprintfRT(w, format, a...)
-	}
+func (c *Color) FprintfRTFunc() func(w io.Writer, format string, a ...interface{}) (int, error) {
+	return c.FprintfRT
 }
 
 // PrintfFunc returns a new function that prints the passed arguments as
 // colorized with color.Printf().
-func (c *Color) PrintfFunc() func(format string, a ...interface{}) {
-	return func(format string, a ...interface{}) {
-		c.Printf(format, a...)
-	}
+func (c *Color) PrintfFunc() func(format string, a ...interface{}) (int, error) {
+	return c.Printf
 }
 
 // PrintfRTFunc returns a new function that prints the passed arguments as
 // colorized with color.PrintfRT().
-func (c *Color) PrintfRTFunc() func(format string, a ...interface{}) {
-	return func(format string, a ...interface{}) {
-		c.PrintfRT(format, a...)
-	}
+func (c *Color) PrintfRTFunc() func(format string, a ...interface{}) (int, error) {
+	return c.PrintfRT
 }
-
 
 // FprintlnFunc returns a new function that prints the passed arguments as
 // colorized with color.Fprintln().
-func (c *Color) FprintlnFunc() func(w io.Writer, a ...interface{}) {
-	return func(w io.Writer, a ...interface{}) {
-		c.Fprintln(w, a...)
-	}
+func (c *Color) FprintlnFunc() func(w io.Writer, a ...interface{}) (int, error) {
+	return c.Fprintln
 }
 
 // FprintlnRTFunc returns a new function that prints the passed arguments as
 // colorized with color.FprintlnRT().
-func (c *Color) FprintlnRTFunc() func(w io.Writer, a ...interface{}) {
-	return func(w io.Writer, a ...interface{}) {
-		c.FprintlnRT(w, a...)
-	}
+func (c *Color) FprintlnRTFunc() func(w io.Writer, a ...interface{}) (int, error) {
+	return c.FprintlnRT
 }
 
 // PrintlnFunc returns a new function that prints the passed arguments as
 // colorized with color.Println().
-func (c *Color) PrintlnFunc() func(a ...interface{}) {
-	return func(a ...interface{}) {
-		c.Println(a...)
-	}
+func (c *Color) PrintlnFunc() func(a ...interface{}) (int, error) {
+	return c.Println
 }
 
 // PrintlnRTFunc returns a new function that prints the passed arguments as
 // colorized with color.PrintlnRT().
-func (c *Color) PrintlnRTFunc() func(a ...interface{}) {
-	return func(a ...interface{}) {
-		c.PrintlnRT(a...)
-	}
+func (c *Color) PrintlnRTFunc() func(a ...interface{}) (int, error) {
+	return c.PrintlnRT
 }
 
 // SprintFunc returns a new function that returns colorized strings for the
@@ -485,9 +459,7 @@ func (c *Color) SprintFunc() func(a ...interface{}) string {
 //	put := New().SprintRTFunc()
 //	fmt.Fprintf(color.Output, "This is a %s", put("warning"))
 func (c *Color) SprintRTFunc() func(a ...interface{}) string {
-	return func(a ...interface{}) string {
-		return c.wrapRichText(fmt.Sprint(a...))
-	}
+	return c.SprintRT
 }
 
 // SprintfFunc returns a new function that returns colorized strings for the
@@ -501,9 +473,7 @@ func (c *Color) SprintfFunc() func(format string, a ...interface{}) string {
 // given arguments with fmt.Sprintf(). Useful to put into or mix into other
 // string. Windows users should use this in conjunction with color.Output.
 func (c *Color) SprintfRTFunc() func(format string, a ...interface{}) string {
-	return func(format string, a ...interface{}) string {
-		return c.wrapRichText(fmt.Sprintf(format, a...))
-	}
+	return c.SprintfRT
 }
 
 // SprintlnFunc returns a new function that returns colorized strings for the
@@ -517,9 +487,7 @@ func (c *Color) SprintlnFunc() func(a ...interface{}) string {
 // given arguments with fmt.Sprintln(). Useful to put into or mix into other
 // string. Windows users should use this in conjunction with color.Output.
 func (c *Color) SprintlnRTFunc() func(a ...interface{}) string {
-	return func(a ...interface{}) string {
-		return c.wrapRichText(fmt.Sprintln(a...))
-	}
+	return c.SprintlnRT
 }
 
 // sequence returns a formatted SGR sequence to be plugged into a "\x1b[...m"
@@ -569,6 +537,12 @@ func (c *Color) wrapRichText(s string) (str string) {
 		re = regexp.MustCompile(fmt.Sprintf("(?i)\\(%s\\|(.+)\\)", key))
 		str = re.ReplaceAllString(str, colorString("$1", value))
 	}
+
+	// group BASH color escapes into one units
+	re = regexp.MustCompile("(?i)(\x1b\\[0m)+")
+	str = re.ReplaceAllString(str, "$1")
+	re = regexp.MustCompile("(?i)m\\x1b\\[")
+	str = re.ReplaceAllString(str, ";")
 	return
 }
 

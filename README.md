@@ -16,6 +16,15 @@ go get github.com/fatih/color
 
 ## Examples
 
+### New: Rich Text Processing
+You can now have multiple set of colors and font effects formatted into a string using an easy rich text syntax
+```go
+clr := color.New()
+
+clr.PrintlnRT("This is a *bold text*, an _italic text_, an ~underlined text~, a (fg:red|red string) and a (bg:blue|blue background)")
+```
+You can also nest them to mix effects like an underlined blue text: `(fg:blue|~Link~)`, or a bold red text: `(fg:red|*WARNING*)`.
+
 ### Standard colors
 
 ```go
