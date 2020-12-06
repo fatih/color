@@ -340,3 +340,30 @@ func TestNoFormatString(t *testing.T) {
 		}
 	}
 }
+
+func TestColor_RichTextProcessor(t *testing.T) {
+	mixed := New().PrintfRTFunc()
+
+	mixed("This is the example of *Rich Text Formatting* in the ~terminal~. (fg:black|(bg:cyan|BLACK text on a CYAN background)).\n")
+
+	getRichString := New().SprintRTFunc()
+
+	tests := []struct {
+		actual   string
+		expected string
+	}{
+		{"This is *bold*", "This is \x1b[1mbold\x1b[0m"},
+		{"This is in _italic_", "This is in \x1b[3mitalic\x1b[0m"},
+		{"This is ~underlined~", "This is \x1b[4munderlined\x1b[0m"},
+		{"This is (fg:red|red text)", "This is \x1b[31mred text\x1b[0m"},
+		{"This has a (bg:blue|blue background)", "This has a \x1b[44mblue background\x1b[0m"},
+	}
+
+	for i, test := range tests {
+		actual := fmt.Sprintf(getRichString(test.actual))
+
+		if actual != test.expected {
+			t.Errorf("[%d] expected: %s, got: %s", i + 1, test.expected, actual)
+		}
+	}
+}
