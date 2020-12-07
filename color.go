@@ -520,6 +520,7 @@ func (c *Color) wrapRichText(s string) (str string) {
 	}
 	var re *regexp.Regexp
 
+process:
 	// process bold format
 	re = regexp.MustCompile("\\*([^*]+)\\*")
 	str = re.ReplaceAllString(s, BoldString("$1"))
@@ -534,8 +535,11 @@ func (c *Color) wrapRichText(s string) (str string) {
 
 	//process colors format
 	for key, value := range colorMap {
-		re = regexp.MustCompile(fmt.Sprintf("(?i)\\(%s\\|(.+)\\)", key))
+		re = regexp.MustCompile(fmt.Sprintf("(?i)\\(%s\\|([^()]+)\\)", key))
 		str = re.ReplaceAllString(str, colorString("$1", value))
+	}
+	if ok, _ := regexp.MatchString("(?i)(\\(((fg|bg):([a-z]+))|[^()]+\\)|\\*([^*]+)\\*|_([^_]+)_|~([^~]+)~)", str); ok {
+		goto process
 	}
 
 	// group BASH color escapes into one units
