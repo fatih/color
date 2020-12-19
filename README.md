@@ -134,7 +134,6 @@ definitions. For example suppose you have a CLI app and a `--no-color` bool flag
 can easily disable the color output with:
 
 ```go
-
 var flagNoColor = flag.Bool("no-color", false, "Disable color output")
 
 if *flagNoColor {
