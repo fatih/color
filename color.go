@@ -113,6 +113,20 @@ func New(value ...Attribute) *Color {
 	return c
 }
 
+// Merge adds all SGR parameters from the given colors and returns a new color.
+// Example:
+//     a := color.New(color.FgRed)
+//     b := color.New(color.Bold, color.BgGreen)
+//     c := color.New(color.Italic)
+//     m := color.Merge(a, b, c /* ... */)        // returns a new color without modifying a, b, or c
+func Merge(colors ...*Color) *Color {
+	merged := New()
+	for _, c := range colors {
+		merged.params = append(merged.params, c.params...)
+	}
+	return merged
+}
+
 // Set sets the given parameters immediately. It will change the color of
 // output with the given SGR parameters until color.Unset() is called.
 func Set(p ...Attribute) *Color {
