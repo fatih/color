@@ -235,7 +235,20 @@ func TestColorVisual(t *testing.T) {
 	fmt.Fprintf(Output, "this %s rocks!\n", info("package"))
 
 	notice := New(FgBlue).FprintFunc()
-	notice(os.Stderr, "just a blue notice to stderr")
+	notice(os.Stderr, "just a blue notice to stderr\n")
+
+	// Test Merge
+	a := New(FgRed)
+	b := New(Bold, Italic)
+	m := Merge(a, b)
+	expectedColor := New(FgRed, Bold, Italic)
+
+	fmt.Println(m.Sprintf("this is the merged color"))
+	fmt.Println(expectedColor.Sprintf("this is the expected color"))
+
+	if !m.Equals(expectedColor) {
+		t.Error("Merged color is not equal to expected color")
+	}
 
 	// Fifth Visual Test
 	fmt.Println()
