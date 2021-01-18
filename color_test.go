@@ -155,6 +155,17 @@ func TestNoColor(t *testing.T) {
 		}
 	}
 
+	// fluent-style API for DisableColor/EnableColor
+	var cp *Color
+	p := New(FgRed)
+	cp = p.EnableColor()
+	if cp == nil {
+		t.Errorf("Expecting *Color, not nil")
+	}
+	cp = p.DisableColor()
+	if cp == nil {
+		t.Errorf("Expecting *Color, not nil")
+	}
 }
 
 func TestColorVisual(t *testing.T) {
