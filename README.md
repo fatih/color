@@ -155,6 +155,10 @@ c.EnableColor()
 c.Println("This prints again cyan...")
 ```
 
+## GitHub Actions
+
+To output color in GitHub Actions (or other CI systems that support ANSI colors), make sure to set `color.NoColor = false` so that it bypasses mangling checks. 
+
 ## Todo
 
 * Save/Return previous values
