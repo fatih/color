@@ -157,7 +157,7 @@ c.Println("This prints again cyan...")
 
 ## GitHub Actions
 
-To output color in GitHub Actions (or other CI systems that support ANSI colors), make sure to set `color.NoColor = false` so that it bypasses mangling checks. 
+To output color in GitHub Actions (or other CI systems that support ANSI colors), make sure to set `color.NoColor = false` so that it bypasses the check for non-tty output streams. 
 
 ## Todo
 
@@ -173,4 +173,3 @@ To output color in GitHub Actions (or other CI systems that support ANSI colors)
 ## License
 
 The MIT License (MIT) - see [`LICENSE.md`](https://github.com/fatih/color/blob/master/LICENSE.md) for more details
-
