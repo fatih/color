@@ -12,10 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Set up Go 1.16
+    - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: ^1.16
+        go-version: ^1.17
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
@@ -35,6 +35,15 @@ jobs:
       
     - name: Test
       run: go test -race ./...
+
+    - name: Lint
+      run: "go vet ./..."
+
+    - name: Staticcheck
+      uses: dominikh/staticcheck-action@v1.1.0
+      with:
+        version: "2021.1.1"
+        install-go: false
 
     - name: Build
       run: go build  ./...
