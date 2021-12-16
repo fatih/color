@@ -377,7 +377,8 @@ func TestNoFormatString(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		s := fmt.Sprintf("%s", test.f(test.format, test.args...))
+		s := test.f(test.format, test.args...)
+
 		if s != test.want {
 			t.Errorf("[%d] want: %q, got: %q", i, test.want, s)
 		}
