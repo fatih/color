@@ -130,7 +130,9 @@ There might be a case where you want to explicitly disable/enable color output. 
 (for example if the output were piped directly to `less`).
 
 The `color` package also disables color output if the [`NO_COLOR`](https://no-color.org) environment
-variable is set (regardless of its value).
+variable is set (regardless of its value). Setting the `FORCE_COLOR` 
+environment variable to value different from `0` will force enable color 
+output, even for non-tty output streams.
 
 `Color` has support to disable/enable colors programatically both globally and
 for single color definitions. For example suppose you have a CLI app and a
@@ -160,7 +162,16 @@ c.Println("This prints again cyan...")
 
 ## GitHub Actions
 
-To output color in GitHub Actions (or other CI systems that support ANSI colors), make sure to set `color.NoColor = false` so that it bypasses the check for non-tty output streams. 
+To output color in GitHub Actions (or other CI systems that support ANSI 
+colors), make sure to set `color.NoColor = false` so that it bypasses the check
+for non-tty output streams.
+
+Easiest way to do it can be leveraging the `FORCE_COLOR` environment variable:
+
+```yaml
+env:
+  FORCE_COLOR: true
+```
 
 ## Todo
 
