@@ -200,6 +200,25 @@ func TestNoColor_Env(t *testing.T) {
 
 }
 
+func TestForceColorEnv(t *testing.T) {
+	_ = os.Setenv("FORCE_COLOR", "1")
+	t.Cleanup(func() {
+		_ = os.Unsetenv("FORCE_COLOR")
+	})
+
+	rb := new(bytes.Buffer)
+	Output = rb
+
+	p := New(FgHiCyan)
+	text := "text to be colored"
+	_, _ = p.Print(text)
+
+	line, _ := rb.ReadString('\n')
+	if line == text {
+		t.Errorf("Expecting '%s' be colored\n", line)
+	}
+}
+
 func TestColorVisual(t *testing.T) {
 	// First Visual Test
 	Output = colorable.NewColorableStdout()

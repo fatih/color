@@ -19,8 +19,7 @@ var (
 	// set (regardless of its value). This is a global option and affects all
 	// colors. For more control over each color block use the methods
 	// DisableColor() individually.
-	NoColor = noColorExists() || os.Getenv("TERM") == "dumb" ||
-		(!isatty.IsTerminal(os.Stdout.Fd()) && !isatty.IsCygwinTerminal(os.Stdout.Fd()))
+	NoColor = calculateNoColor()
 
 	// Output defines the standard output of the print functions. By default
 	// os.Stdout is used.
@@ -34,6 +33,47 @@ var (
 	colorsCache   = make(map[Attribute]*Color)
 	colorsCacheMu sync.Mutex // protects colorsCache
 )
+
+func calculateNoColor() bool {
+	mode := resolveColorMode()
+	if mode.set() {
+		return !mode.colored()
+	}
+	return noColorExists() || os.Getenv("TERM") == "dumb" ||
+		(!isatty.IsTerminal(os.Stdout.Fd()) && !isatty.IsCygwinTerminal(os.Stdout.Fd()))
+}
+
+type colorMode int
+
+const notForcedColor colorMode = -1
+const (
+	noColor colorMode = iota
+	color16
+	color256
+	color16M
+)
+
+func (c colorMode) set() bool {
+	return c != notForcedColor
+}
+
+func (c colorMode) colored() bool {
+	return c > noColor
+}
+
+func resolveColorMode() colorMode {
+	if ev, set := os.LookupEnv("FORCE_COLOR"); set {
+		ev = strings.ToLower(ev)
+		if mode, err := strconv.Atoi(ev); err == nil {
+			return colorMode(mode)
+		}
+		if ev == "yes" || ev == "true" {
+			return color256
+		}
+		return noColor
+	}
+	return notForcedColor
+}
 
 // noColorExists returns true if the environment variable NO_COLOR exists.
 func noColorExists() bool {
@@ -122,6 +162,10 @@ func New(value ...Attribute) *Color {
 
 	if noColorExists() {
 		c.noColor = boolPtr(true)
+	}
+
+	if mode := resolveColorMode(); mode.set() {
+		c.noColor = boolPtr(!mode.colored())
 	}
 
 	c.Add(value...)
