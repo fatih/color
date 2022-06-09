@@ -11,7 +11,7 @@ suits you.
 ## Install
 
 ```bash
-go get github.com/fatih/color
+go install github.com/fatih/color
 ```
 
 ## Examples
