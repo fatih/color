@@ -130,9 +130,7 @@ func TestNoColor(t *testing.T) {
 	}
 
 	for _, c := range testColors {
-		p := New(c.code)
-		p.DisableColor()
-		p.Print(c.text)
+		New(c.code).DisableColor().Print(c.text)
 
 		line, _ := rb.ReadString('\n')
 		if line != c.text {
@@ -197,7 +195,6 @@ func TestNoColor_Env(t *testing.T) {
 			t.Errorf("Expecting %s, got '%s'\n", c.text, line)
 		}
 	}
-
 }
 
 func TestColorVisual(t *testing.T) {

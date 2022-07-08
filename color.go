@@ -385,14 +385,16 @@ func (c *Color) unformat() string {
 // DisableColor disables the color output. Useful to not change any existing
 // code and still being able to output. Can be used for flags like
 // "--no-color". To enable back use EnableColor() method.
-func (c *Color) DisableColor() {
+func (c *Color) DisableColor() *Color {
 	c.noColor = boolPtr(true)
+	return c
 }
 
 // EnableColor enables the color output. Use it in conjunction with
 // DisableColor(). Otherwise this method has no side effects.
-func (c *Color) EnableColor() {
+func (c *Color) EnableColor() *Color {
 	c.noColor = boolPtr(false)
+	return c
 }
 
 func (c *Color) isNoColorSet() bool {
