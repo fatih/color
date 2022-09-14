@@ -275,6 +275,12 @@ func (c *Color) Sprintf(format string, a ...interface{}) string {
 	return c.wrap(fmt.Sprintf(format, a...))
 }
 
+// Errorf returns the error built-in interface type.
+// This is the standard fmt.Errorf() method wrapped with the given color.
+func (c *Color) Errorf(format string, a ...interface{}) error {
+	return c.wrapError(fmt.Sprintf(format, a...))
+}
+
 // FprintFunc returns a new function that prints the passed arguments as
 // colorized with color.Fprint().
 func (c *Color) FprintFunc() func(w io.Writer, a ...interface{}) {
@@ -372,6 +378,14 @@ func (c *Color) wrap(s string) string {
 	}
 
 	return c.format() + s + c.unformat()
+}
+
+func (c *Color) wrapError(s string) error {
+	if c.isNoColorSet() {
+		return fmt.Errorf(s)
+	}
+
+	return fmt.Errorf(c.format() + s + c.unformat())
 }
 
 func (c *Color) format() string {
