@@ -199,6 +199,41 @@ func TestNoColor_Env(t *testing.T) {
 	}
 }
 
+func Test_noColorIsSet(t *testing.T) {
+	tests := []struct {
+		name string
+		act  func()
+		want bool
+	}{
+		{
+			name: "default",
+			act:  func() {},
+			want: false,
+		},
+		{
+			name: "NO_COLOR=1",
+			act:  func() { os.Setenv("NO_COLOR", "1") },
+			want: true,
+		},
+		{
+			name: "NO_COLOR=",
+			act:  func() { os.Setenv("NO_COLOR", "") },
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Cleanup(func() {
+				os.Unsetenv("NO_COLOR")
+			})
+			tt.act()
+			if got := noColorIsSet(); got != tt.want {
+				t.Errorf("noColorIsSet() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestColorVisual(t *testing.T) {
 	// First Visual Test
 	Output = colorable.NewColorableStdout()
