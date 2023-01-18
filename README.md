@@ -131,7 +131,7 @@ There might be a case where you want to explicitly disable/enable color output. 
 The `color` package also disables color output if the [`NO_COLOR`](https://no-color.org) environment
 variable is set to a non-empty string.
 
-`Color` has support to disable/enable colors programatically both globally and
+`Color` has support to disable/enable colors programmatically both globally and
 for single color definitions. For example suppose you have a CLI app and a
 `-no-color` bool flag. You can easily disable the color output with:
 
