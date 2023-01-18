@@ -19,7 +19,7 @@ var (
 	// set (regardless of its value). This is a global option and affects all
 	// colors. For more control over each color block use the methods
 	// DisableColor() individually.
-	NoColor = noColorExists() || os.Getenv("TERM") == "dumb" ||
+	NoColor = noColorIsSet() || os.Getenv("TERM") == "dumb" ||
 		(!isatty.IsTerminal(os.Stdout.Fd()) && !isatty.IsCygwinTerminal(os.Stdout.Fd()))
 
 	// Output defines the standard output of the print functions. By default,
@@ -35,10 +35,9 @@ var (
 	colorsCacheMu sync.Mutex // protects colorsCache
 )
 
-// noColorExists returns true if the environment variable NO_COLOR exists.
-func noColorExists() bool {
-	_, exists := os.LookupEnv("NO_COLOR")
-	return exists
+// noColorIsSet returns true if the environment variable NO_COLOR is set to a non-empty string.
+func noColorIsSet() bool {
+	return os.Getenv("NO_COLOR") != ""
 }
 
 // Color defines a custom color object which is defined by SGR parameters.
@@ -120,7 +119,7 @@ func New(value ...Attribute) *Color {
 		params: make([]Attribute, 0),
 	}
 
-	if noColorExists() {
+	if noColorIsSet() {
 		c.noColor = boolPtr(true)
 	}
 
