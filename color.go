@@ -163,7 +163,10 @@ func (c *Color) unset() {
 	Unset()
 }
 
-func (c *Color) setWriter(w io.Writer) *Color {
+// SetWriter is used to set the SGR sequence with the given io.Writer. This is
+// a low-level function, and users should use the higher-level functions, such
+// as color.Fprint, color.Print, etc.
+func (c *Color) SetWriter(w io.Writer) *Color {
 	if c.isNoColorSet() {
 		return c
 	}
@@ -172,7 +175,9 @@ func (c *Color) setWriter(w io.Writer) *Color {
 	return c
 }
 
-func (c *Color) unsetWriter(w io.Writer) {
+// UnsetWriter resets all escape attributes and clears the output with the give
+// io.Writer. Usually should be called after SetWriter().
+func (c *Color) UnsetWriter(w io.Writer) {
 	if c.isNoColorSet() {
 		return
 	}
@@ -197,8 +202,8 @@ func (c *Color) Add(value ...Attribute) *Color {
 // On Windows, users should wrap w with colorable.NewColorable() if w is of
 // type *os.File.
 func (c *Color) Fprint(w io.Writer, a ...interface{}) (n int, err error) {
-	c.setWriter(w)
-	defer c.unsetWriter(w)
+	c.SetWriter(w)
+	defer c.UnsetWriter(w)
 
 	return fmt.Fprint(w, a...)
 }
@@ -220,8 +225,8 @@ func (c *Color) Print(a ...interface{}) (n int, err error) {
 // On Windows, users should wrap w with colorable.NewColorable() if w is of
 // type *os.File.
 func (c *Color) Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {
-	c.setWriter(w)
-	defer c.unsetWriter(w)
+	c.SetWriter(w)
+	defer c.UnsetWriter(w)
 
 	return fmt.Fprintf(w, format, a...)
 }
@@ -241,8 +246,8 @@ func (c *Color) Printf(format string, a ...interface{}) (n int, err error) {
 // On Windows, users should wrap w with colorable.NewColorable() if w is of
 // type *os.File.
 func (c *Color) Fprintln(w io.Writer, a ...interface{}) (n int, err error) {
-	c.setWriter(w)
-	defer c.unsetWriter(w)
+	c.SetWriter(w)
+	defer c.UnsetWriter(w)
 
 	return fmt.Fprintln(w, a...)
 }
