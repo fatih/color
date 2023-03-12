@@ -3,6 +3,7 @@ package color
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"testing"
 
@@ -417,4 +418,54 @@ func TestNoFormatString(t *testing.T) {
 			t.Errorf("[%d] want: %q, got: %q", i, test.want, s)
 		}
 	}
+}
+
+func TestColor_Println_Newline(t *testing.T) {
+	rb := new(bytes.Buffer)
+	Output = rb
+
+	c := New(FgRed)
+	c.Println("foo")
+
+	got := readRaw(t, rb)
+	want := "\x1b[31mfoo\x1b[0m\n"
+
+	if want != got {
+		t.Errorf("Println newline error\n\nwant: %q\n got: %q", want, got)
+	}
+}
+
+func TestColor_Sprintln_Newline(t *testing.T) {
+	c := New(FgRed)
+
+	got := c.Sprintln("foo")
+	want := "\x1b[31mfoo\x1b[0m\n"
+
+	if want != got {
+		t.Errorf("Println newline error\n\nwant: %q\n got: %q", want, got)
+	}
+}
+
+func TestColor_Fprintln_Newline(t *testing.T) {
+	rb := new(bytes.Buffer)
+	c := New(FgRed)
+	c.Fprintln(rb, "foo")
+
+	got := readRaw(t, rb)
+	want := "\x1b[31mfoo\x1b[0m\n"
+
+	if want != got {
+		t.Errorf("Println newline error\n\nwant: %q\n got: %q", want, got)
+	}
+}
+
+func readRaw(t *testing.T, r io.Reader) string {
+	t.Helper()
+
+	out, err := io.ReadAll(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return string(out)
 }

@@ -246,10 +246,7 @@ func (c *Color) Printf(format string, a ...interface{}) (n int, err error) {
 // On Windows, users should wrap w with colorable.NewColorable() if w is of
 // type *os.File.
 func (c *Color) Fprintln(w io.Writer, a ...interface{}) (n int, err error) {
-	c.SetWriter(w)
-	defer c.UnsetWriter(w)
-
-	return fmt.Fprintln(w, a...)
+	return fmt.Fprintln(w, c.wrap(fmt.Sprint(a...)))
 }
 
 // Println formats using the default formats for its operands and writes to
@@ -258,10 +255,7 @@ func (c *Color) Fprintln(w io.Writer, a ...interface{}) (n int, err error) {
 // encountered. This is the standard fmt.Print() method wrapped with the given
 // color.
 func (c *Color) Println(a ...interface{}) (n int, err error) {
-	c.Set()
-	defer c.unset()
-
-	return fmt.Fprintln(Output, a...)
+	return fmt.Fprintln(Output, c.wrap(fmt.Sprint(a...)))
 }
 
 // Sprint is just like Print, but returns a string instead of printing it.
@@ -271,7 +265,7 @@ func (c *Color) Sprint(a ...interface{}) string {
 
 // Sprintln is just like Println, but returns a string instead of printing it.
 func (c *Color) Sprintln(a ...interface{}) string {
-	return c.wrap(fmt.Sprintln(a...))
+	return fmt.Sprintln(c.Sprint(a...))
 }
 
 // Sprintf is just like Printf, but returns a string instead of printing it.
@@ -353,7 +347,7 @@ func (c *Color) SprintfFunc() func(format string, a ...interface{}) string {
 // string. Windows users should use this in conjunction with color.Output.
 func (c *Color) SprintlnFunc() func(a ...interface{}) string {
 	return func(a ...interface{}) string {
-		return c.wrap(fmt.Sprintln(a...))
+		return fmt.Sprintln(c.Sprint(a...))
 	}
 }
 
