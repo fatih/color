@@ -405,6 +405,12 @@ func (c *Color) isNoColorSet() bool {
 
 // Equals returns a boolean value indicating whether two colors are equal.
 func (c *Color) Equals(c2 *Color) bool {
+	if c == nil && c2 == nil {
+		return true
+	}
+	if c == nil || c2 == nil {
+		return false
+	}
 	if len(c.params) != len(c2.params) {
 		return false
 	}
