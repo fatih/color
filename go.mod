@@ -7,4 +7,4 @@ require (
 	github.com/mattn/go-isatty v0.0.19
 )
 
-require golang.org/x/sys v0.10.0
+require golang.org/x/sys v0.11.0
