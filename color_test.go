@@ -469,3 +469,19 @@ func readRaw(t *testing.T, r io.Reader) string {
 
 	return string(out)
 }
+
+func TestResetSecondFormat(t *testing.T) {
+
+	var underline = New(Underline).Sprint
+
+	var line = fmt.Sprintf("%s %s %s %s", "word1", underline("word2"), "word3", underline("word4"))
+
+	line = CyanString(line)
+
+	var result = fmt.Sprintf("%v", line)
+	const expectedResult = "[36mword1 [4mword2[24m word3 [4mword4[24m[0m"
+
+	if !bytes.Equal([]byte(result), []byte(expectedResult)) {
+		t.Errorf("Expecting %v, got '%v'\n", expectedResult, result)
+	}
+}
