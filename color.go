@@ -404,10 +404,9 @@ func (c *Color) unformat() string {
 	//for each element in sequence let's use the speficic reset escape, ou the generic one if not found
 	format := make([]string, len(c.params))
 	for i, v := range c.params {
+		format[i] = strconv.Itoa(int(Reset))
 		ra, ok := mapResetAttributes[v]
-		if !ok {
-			format[i] = strconv.Itoa(int(Reset))
-		} else {
+		if ok {
 			format[i] = strconv.Itoa(int(ra))
 		}
 	}
