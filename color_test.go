@@ -470,7 +470,7 @@ func readRaw(t *testing.T, r io.Reader) string {
 	return string(out)
 }
 
-func TestResetSecondFormat(t *testing.T) {
+func TestIssue206_1(t *testing.T) {
 
 	var underline = New(Underline).Sprint
 
@@ -480,6 +480,23 @@ func TestResetSecondFormat(t *testing.T) {
 
 	var result = fmt.Sprintf("%v", line)
 	const expectedResult = "[36mword1 [4mword2[24m word3 [4mword4[24m[0m"
+
+	if !bytes.Equal([]byte(result), []byte(expectedResult)) {
+		t.Errorf("Expecting %v, got '%v'\n", expectedResult, result)
+	}
+}
+
+func TestIssue206_2(t *testing.T) {
+
+	var underline = New(Underline).Sprint
+	var bold = New(Bold).Sprint
+
+	var line = fmt.Sprintf("%s %s", GreenString(underline("underlined regular green")), RedString(bold("bold red")))
+
+	fmt.Println(line)
+
+	var result = fmt.Sprintf("%v", line)
+	const expectedResult = "[32m[4munderlined regular green[24m[0m [31m[1mbold red[22m[0m"
 
 	if !bytes.Equal([]byte(result), []byte(expectedResult)) {
 		t.Errorf("Expecting %v, got '%v'\n", expectedResult, result)
