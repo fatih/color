@@ -66,24 +66,24 @@ const (
 )
 
 const (
-	ResetBoldFaint Attribute = iota + 22
+	ResetBold Attribute = iota + 22
 	ResetItalic
 	ResetUnderline
-	ResetBlinkSlow
-	ResetBlinkRapid
-	ResetReverseVideo
+	ResetBlinking
+	_
+	ResetReversed
 	ResetConcealed
 	ResetCrossedOut
 )
 
 var mapResetAttributes map[Attribute]Attribute = map[Attribute]Attribute{
-	Bold:         ResetBoldFaint,
-	Faint:        ResetBoldFaint,
+	Bold:         ResetBold,
+	Faint:        ResetBold,
 	Italic:       ResetItalic,
 	Underline:    ResetUnderline,
-	BlinkSlow:    ResetBlinkSlow,
-	BlinkRapid:   ResetBlinkRapid,
-	ReverseVideo: ResetReverseVideo,
+	BlinkSlow:    ResetBlinking,
+	BlinkRapid:   ResetBlinking,
+	ReverseVideo: ResetReversed,
 	Concealed:    ResetConcealed,
 	CrossedOut:   ResetCrossedOut,
 }
