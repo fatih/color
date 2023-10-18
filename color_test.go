@@ -471,7 +471,6 @@ func readRaw(t *testing.T, r io.Reader) string {
 }
 
 func TestIssue206_1(t *testing.T) {
-
 	//visual test, go test -v .
 	//to  see the string with escape codes, use go test -v . > c:\temp\test.txt
 	var underline = New(Underline).Sprint
@@ -491,7 +490,6 @@ func TestIssue206_1(t *testing.T) {
 }
 
 func TestIssue206_2(t *testing.T) {
-
 	var underline = New(Underline).Sprint
 	var bold = New(Bold).Sprint
 
