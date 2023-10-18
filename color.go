@@ -65,6 +65,29 @@ const (
 	CrossedOut
 )
 
+const (
+	ResetBold Attribute = iota + 22
+	ResetItalic
+	ResetUnderline
+	ResetBlinking
+	_
+	ResetReversed
+	ResetConcealed
+	ResetCrossedOut
+)
+
+var mapResetAttributes map[Attribute]Attribute = map[Attribute]Attribute{
+	Bold:         ResetBold,
+	Faint:        ResetBold,
+	Italic:       ResetItalic,
+	Underline:    ResetUnderline,
+	BlinkSlow:    ResetBlinking,
+	BlinkRapid:   ResetBlinking,
+	ReverseVideo: ResetReversed,
+	Concealed:    ResetConcealed,
+	CrossedOut:   ResetCrossedOut,
+}
+
 // Foreground text colors
 const (
 	FgBlack Attribute = iota + 30
@@ -377,7 +400,18 @@ func (c *Color) format() string {
 }
 
 func (c *Color) unformat() string {
-	return fmt.Sprintf("%s[%dm", escape, Reset)
+	//return fmt.Sprintf("%s[%dm", escape, Reset)
+	//for each element in sequence let's use the speficic reset escape, ou the generic one if not found
+	format := make([]string, len(c.params))
+	for i, v := range c.params {
+		format[i] = strconv.Itoa(int(Reset))
+		ra, ok := mapResetAttributes[v]
+		if ok {
+			format[i] = strconv.Itoa(int(ra))
+		}
+	}
+
+	return fmt.Sprintf("%s[%sm", escape, strings.Join(format, ";"))
 }
 
 // DisableColor disables the color output. Useful to not change any existing
