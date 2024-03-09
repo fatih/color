@@ -98,6 +98,9 @@ const (
 	FgMagenta
 	FgCyan
 	FgWhite
+
+	// used internally for 256 and 24bit coloring
+	foreground
 )
 
 // Foreground Hi-Intensity text colors
@@ -122,6 +125,9 @@ const (
 	BgMagenta
 	BgCyan
 	BgWhite
+
+	// used internally for 256 and 24bit coloring
+	background
 )
 
 // Background Hi-Intensity text colors
@@ -147,6 +153,30 @@ func New(value ...Attribute) *Color {
 	}
 
 	c.Add(value...)
+	return c
+}
+
+// RGB returns a newly created foreground 24-bit RGB color.
+func RGB(r, g, b int) *Color {
+	return New(foreground, 2, Attribute(r), Attribute(g), Attribute(b))
+}
+
+// BgRGB returns a newly created 24-bit background RGB color.
+func BgRGB(r, g, b int) *Color {
+	return New(background, 2, Attribute(r), Attribute(g), Attribute(b))
+}
+
+// AddRGB is used to chain foreground RGB SGR parameters. Use as many as parameters to combine
+// and create custom color objects. Example: .Add(34, 0, 12).Add(255, 128, 0).
+func (c *Color) AddRGB(r, g, b int) *Color {
+	c.params = append(c.params, foreground, 2, Attribute(r), Attribute(g), Attribute(b))
+	return c
+}
+
+// AddRGB is used to chain background RGB SGR parameters. Use as many as parameters to combine
+// and create custom color objects. Example: .Add(34, 0, 12).Add(255, 128, 0).
+func (c *Color) AddBgRGB(r, g, b int) *Color {
+	c.params = append(c.params, background, 2, Attribute(r), Attribute(g), Attribute(b))
 	return c
 }
 
