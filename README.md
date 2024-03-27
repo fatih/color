@@ -32,7 +32,7 @@ color.Magenta("And many others ..")
 
 ### RGB colors
 
-If your terminal supports 24-bit colors, you can use RGB color codes
+If your terminal supports 24-bit colors, you can use RGB color codes.
 
 ```go
 color.RGB(255, 128, 0).Println("foreground orange")
