@@ -99,7 +99,7 @@ const (
 	FgCyan
 	FgWhite
 
-	// used internally for 256 and 24bit coloring
+	// used internally for 256 and 24-bit coloring
 	foreground
 )
 
@@ -126,7 +126,7 @@ const (
 	BgCyan
 	BgWhite
 
-	// used internally for 256 and 24bit coloring
+	// used internally for 256 and 24-bit coloring
 	background
 )
 
@@ -156,12 +156,12 @@ func New(value ...Attribute) *Color {
 	return c
 }
 
-// RGB returns a newly created foreground 24-bit RGB color.
+// RGB returns a new foreground color in 24-bit RGB.
 func RGB(r, g, b int) *Color {
 	return New(foreground, 2, Attribute(r), Attribute(g), Attribute(b))
 }
 
-// BgRGB returns a newly created 24-bit background RGB color.
+// BgRGB returns a new background color in 24-bit RGB.
 func BgRGB(r, g, b int) *Color {
 	return New(background, 2, Attribute(r), Attribute(g), Attribute(b))
 }
