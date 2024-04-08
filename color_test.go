@@ -504,3 +504,34 @@ func TestIssue206_2(t *testing.T) {
 		t.Errorf("Expecting %v, got '%v'\n", expectedResult, result)
 	}
 }
+
+func TestIssue218(t *testing.T) {
+	// Adds a newline to the end of the last string to make sure it isn't trimmed.
+	params := []interface{}{"word1", "word2", "word3", "word4\n"}
+
+	c := New(FgCyan)
+	c.Println(params...)
+
+	var result = c.Sprintln(params...)
+	fmt.Println(params...)
+	fmt.Print(result)
+
+	const expectedResult = "\x1b[36mword1 word2 word3 word4\n\x1b[0m\n"
+
+	if !bytes.Equal([]byte(result), []byte(expectedResult)) {
+		t.Errorf("Sprintln: Expecting %v (%v), got '%v (%v)'\n", expectedResult, []byte(expectedResult), result, []byte(result))
+	}
+
+	fn := c.SprintlnFunc()
+	result = fn(params...)
+	if !bytes.Equal([]byte(result), []byte(expectedResult)) {
+		t.Errorf("SprintlnFunc: Expecting %v (%v), got '%v (%v)'\n", expectedResult, []byte(expectedResult), result, []byte(result))
+	}
+
+	var buf bytes.Buffer
+	c.Fprintln(&buf, params...)
+	result = buf.String()
+	if !bytes.Equal([]byte(result), []byte(expectedResult)) {
+		t.Errorf("Fprintln: Expecting %v (%v), got '%v (%v)'\n", expectedResult, []byte(expectedResult), result, []byte(result))
+	}
+}
