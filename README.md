@@ -178,10 +178,6 @@ c.Println("This prints again cyan...")
 
 To output color in GitHub Actions (or other CI systems that support ANSI colors), make sure to set `color.NoColor = false` so that it bypasses the check for non-tty output streams. 
 
-## Todo
-
-* Save/Return previous values
-* Evaluate fmt.Formatter interface
 
 ## Credits
 
