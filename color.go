@@ -101,6 +101,7 @@ const (
 
 	// used internally for 256 and 24-bit coloring
 	foreground
+	FgDefault
 )
 
 // Foreground Hi-Intensity text colors
@@ -128,6 +129,7 @@ const (
 
 	// used internally for 256 and 24-bit coloring
 	background
+	BgDefault
 )
 
 // Background Hi-Intensity text colors
