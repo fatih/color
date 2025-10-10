@@ -158,49 +158,7 @@ func TestNoColor(t *testing.T) {
 	}
 }
 
-func TestNoColor_Env(t *testing.T) {
-	rb := new(bytes.Buffer)
-	Output = rb
-
-	testColors := []struct {
-		text string
-		code Attribute
-	}{
-		{text: "black", code: FgBlack},
-		{text: "red", code: FgRed},
-		{text: "green", code: FgGreen},
-		{text: "yellow", code: FgYellow},
-		{text: "blue", code: FgBlue},
-		{text: "magent", code: FgMagenta},
-		{text: "cyan", code: FgCyan},
-		{text: "white", code: FgWhite},
-		{text: "hblack", code: FgHiBlack},
-		{text: "hred", code: FgHiRed},
-		{text: "hgreen", code: FgHiGreen},
-		{text: "hyellow", code: FgHiYellow},
-		{text: "hblue", code: FgHiBlue},
-		{text: "hmagent", code: FgHiMagenta},
-		{text: "hcyan", code: FgHiCyan},
-		{text: "hwhite", code: FgHiWhite},
-	}
-
-	os.Setenv("NO_COLOR", "1")
-	t.Cleanup(func() {
-		os.Unsetenv("NO_COLOR")
-	})
-
-	for _, c := range testColors {
-		p := New(c.code)
-		p.Print(c.text)
-
-		line, _ := rb.ReadString('\n')
-		if line != c.text {
-			t.Errorf("Expecting %s, got '%s'\n", c.text, line)
-		}
-	}
-}
-
-func Test_noColorIsSet(t *testing.T) {
+func Test_hasNoColorEnv(t *testing.T) {
 	tests := []struct {
 		name string
 		act  func()
@@ -228,8 +186,8 @@ func Test_noColorIsSet(t *testing.T) {
 				os.Unsetenv("NO_COLOR")
 			})
 			tt.act()
-			if got := noColorIsSet(); got != tt.want {
-				t.Errorf("noColorIsSet() = %v, want %v", got, tt.want)
+			if got := hasNoColorEnv(); got != tt.want {
+				t.Errorf("hasNoColorEnv() = %v, want %v", got, tt.want)
 			}
 		})
 	}

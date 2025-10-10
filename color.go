@@ -19,7 +19,8 @@ var (
 	// set (regardless of its value). This is a global option and affects all
 	// colors. For more control over each color block use the methods
 	// DisableColor() individually.
-	NoColor = noColorIsSet() || os.Getenv("TERM") == "dumb" ||
+	// NOTE: NO_COLOR environment variable will only be checked at init.
+	NoColor = hasNoColorEnv() || os.Getenv("TERM") == "dumb" ||
 		(!isatty.IsTerminal(os.Stdout.Fd()) && !isatty.IsCygwinTerminal(os.Stdout.Fd()))
 
 	// Output defines the standard output of the print functions. By default,
@@ -35,15 +36,15 @@ var (
 	colorsCacheMu sync.Mutex // protects colorsCache
 )
 
-// noColorIsSet returns true if the environment variable NO_COLOR is set to a non-empty string.
-func noColorIsSet() bool {
+// hasNoColorEnv returns true if the environment variable NO_COLOR is set to a non-empty string.
+func hasNoColorEnv() bool {
 	return os.Getenv("NO_COLOR") != ""
 }
 
 // Color defines a custom color object which is defined by SGR parameters.
 type Color struct {
 	params  []Attribute
-	noColor *bool
+	noColor bool
 }
 
 // Attribute defines a single SGR Code
@@ -148,8 +149,10 @@ func New(value ...Attribute) *Color {
 		params: make([]Attribute, 0),
 	}
 
-	if noColorIsSet() {
-		c.noColor = boolPtr(true)
+	if NoColor {
+		c.noColor = true
+	} else {
+		c.noColor = false
 	}
 
 	c.Add(value...)
@@ -200,7 +203,7 @@ func Unset() {
 
 // Set sets the SGR sequence.
 func (c *Color) Set() *Color {
-	if c.isNoColorSet() {
+	if c.noColor {
 		return c
 	}
 
@@ -209,7 +212,7 @@ func (c *Color) Set() *Color {
 }
 
 func (c *Color) unset() {
-	if c.isNoColorSet() {
+	if c.noColor {
 		return
 	}
 
@@ -220,7 +223,7 @@ func (c *Color) unset() {
 // a low-level function, and users should use the higher-level functions, such
 // as color.Fprint, color.Print, etc.
 func (c *Color) SetWriter(w io.Writer) *Color {
-	if c.isNoColorSet() {
+	if c.noColor {
 		return c
 	}
 
@@ -231,7 +234,7 @@ func (c *Color) SetWriter(w io.Writer) *Color {
 // UnsetWriter resets all escape attributes and clears the output with the give
 // io.Writer. Usually should be called after SetWriter().
 func (c *Color) UnsetWriter(w io.Writer) {
-	if c.isNoColorSet() {
+	if c.noColor {
 		return
 	}
 
@@ -414,7 +417,7 @@ func (c *Color) sequence() string {
 // wrap wraps the s string with the colors attributes. The string is ready to
 // be printed.
 func (c *Color) wrap(s string) string {
-	if c.isNoColorSet() {
+	if c.noColor {
 		return s
 	}
 
@@ -444,23 +447,13 @@ func (c *Color) unformat() string {
 // code and still being able to output. Can be used for flags like
 // "--no-color". To enable back use EnableColor() method.
 func (c *Color) DisableColor() {
-	c.noColor = boolPtr(true)
+	c.noColor = true
 }
 
 // EnableColor enables the color output. Use it in conjunction with
 // DisableColor(). Otherwise, this method has no side effects.
 func (c *Color) EnableColor() {
-	c.noColor = boolPtr(false)
-}
-
-func (c *Color) isNoColorSet() bool {
-	// check first if we have user set action
-	if c.noColor != nil {
-		return *c.noColor
-	}
-
-	// if not return the global option, which is disabled by default
-	return NoColor
+	c.noColor = false
 }
 
 // Equals returns a boolean value indicating whether two colors are equal.
@@ -492,10 +485,6 @@ func (c *Color) attrExists(a Attribute) bool {
 	}
 
 	return false
-}
-
-func boolPtr(v bool) *bool {
-	return &v
 }
 
 func getCachedColor(p Attribute) *Color {
