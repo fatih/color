@@ -238,6 +238,7 @@ func Test_noColorIsSet(t *testing.T) {
 func TestColorVisual(t *testing.T) {
 	// First Visual Test
 	Output = colorable.NewColorableStdout()
+	NoColor = false
 
 	New(FgRed).Printf("red\t")
 	New(BgRed).Print("         ")
@@ -266,6 +267,8 @@ func TestColorVisual(t *testing.T) {
 	New(FgWhite).Printf("white\t")
 	New(BgWhite).Print("         ")
 	New(FgWhite, Bold).Println(" white")
+	New(FgGreen).Hyperlink("https://example.com").Println("This should be clickable if your terminal supports it!")
+
 	fmt.Println("")
 
 	// Second Visual test
@@ -551,5 +554,150 @@ func TestRGB(t *testing.T) {
 			BgRGB(tt.r, tt.g, tt.b).Println("background")
 			BgRGB(tt.r, tt.g, tt.b).AddRGB(255, 255, 255).Println("with foreground")
 		})
+	}
+}
+
+func TestSpecificUnset(t *testing.T) {
+	originalOutput := Output
+	t.Cleanup(func() {
+		Output = originalOutput
+		NoColor = false
+	})
+	NoColor = false
+
+	boldC := New(Bold)
+	underlineC := New(Underline)
+
+	t.Run("Print retains outer style", func(t *testing.T) {
+		buf := new(bytes.Buffer)
+		Output = buf
+
+		fmt.Fprint(buf, underlineC.format())
+		boldC.Print("bold text")
+		fmt.Fprint(buf, " still underlined?")
+		buf.Reset()
+
+		fmt.Fprint(buf, underlineC.format())
+		boldC.Printf("bold text")
+		fmt.Fprint(buf, " still underlined?")
+		fmt.Fprint(buf, New(Reset).format())
+
+		want := "\x1b[4m\x1b[1mbold text\x1b[22m still underlined?\x1b[0m"
+		got := readRaw(t, buf)
+
+		if want != got {
+			t.Errorf("Print specific reset failed:\n want: %q\n  got: %q", want, got)
+		}
+	})
+
+	t.Run("Fprint retains outer style", func(t *testing.T) {
+		buf := new(bytes.Buffer)
+		fmt.Fprint(buf, underlineC.format())
+		boldC.Fprintf(buf, "bold text")
+		fmt.Fprint(buf, " still underlined?")
+		fmt.Fprint(buf, New(Reset).format())
+
+		want := "\x1b[4m\x1b[1mbold text\x1b[22m still underlined?\x1b[0m"
+		got := readRaw(t, buf)
+
+		if want != got {
+			t.Errorf("Fprint specific reset failed:\n want: %q\n  got: %q", want, got)
+		}
+	})
+
+	t.Run("Manual Set/Unset retains outer style", func(t *testing.T) {
+		buf := new(bytes.Buffer)
+		Output = buf
+
+		fmt.Fprint(buf, underlineC.format())
+		boldC.Set()
+		fmt.Fprint(buf, "bold text")
+		boldC.Unset()
+		fmt.Fprint(buf, " still underlined?")
+		fmt.Fprint(buf, New(Reset).format())
+
+		want := "\x1b[4m\x1b[1mbold text\x1b[22m still underlined?\x1b[0m"
+		got := readRaw(t, buf)
+
+		if want != got {
+			t.Errorf("Manual Set/Unset specific reset failed:\n want: %q\n  got: %q", want, got)
+		}
+	})
+
+	t.Run("UnsetWriter retains outer style", func(t *testing.T) {
+		buf := new(bytes.Buffer)
+
+		fmt.Fprint(buf, underlineC.format())
+		boldC.SetWriter(buf)
+		fmt.Fprint(buf, "bold text")
+		boldC.UnsetWriter(buf)
+		fmt.Fprint(buf, " still underlined?")
+		fmt.Fprint(buf, New(Reset).format())
+
+		want := "\x1b[4m\x1b[1mbold text\x1b[22m still underlined?\x1b[0m"
+		got := readRaw(t, buf)
+
+		if want != got {
+			t.Errorf("UnsetWriter specific reset failed:\n want: %q\n  got: %q", want, got)
+		}
+	})
+}
+
+func TestHyperlink_WithColor(t *testing.T) {
+	NoColor = false
+
+	link := "https://example.com"
+	text := "click me"
+	c := New(FgBlue).Hyperlink(link)
+	got := c.Sprint(text)
+	want := "\x1b]8;;" + link + "\x1b\\" + "\x1b[34m" + text + "\x1b[0m" + "\x1b]8;;\x1b\\"
+	if got != want {
+		t.Errorf("Expected %q, got %q", want, got)
+	}
+}
+
+func TestHyperlink_NoColor(t *testing.T) {
+	link := "https://example.com"
+	text := "click me"
+	c := New(FgBlue).Hyperlink(link)
+	c.DisableColor()
+	got := c.Sprint(text)
+	if got != text {
+		t.Errorf("Expected plain text %q when color is disabled, got %q", text, got)
+	}
+}
+
+func TestHyperlink_Fprint(t *testing.T) {
+	NoColor = false
+
+	link := "https://example.com"
+	text := "test output"
+	var buf bytes.Buffer
+	c := New(FgGreen).Hyperlink(link)
+	c.Fprint(&buf, text)
+	want := "\x1b]8;;" + link + "\x1b\\" + "\x1b[32m" + text + "\x1b[0m" + "\x1b]8;;\x1b\\"
+	if buf.String() != want {
+		t.Errorf("Expected %q, got %q", want, buf.String())
+	}
+}
+
+func TestHyperlink_NestedInColor(t *testing.T) {
+	NoColor = false
+
+	link := "https://example.com/"
+	innerColor := New().Hyperlink(link)
+	result := innerColor.Sprint("link")
+
+	expectedWithoutSGR := "\x1b]8;;" + link + "\x1b\\link\x1b]8;;\x1b\\"
+
+	if result != expectedWithoutSGR {
+		t.Errorf("Hyperlink without color attributes should not emit SGR codes.\nExpected: %q\nGot: %q", expectedWithoutSGR, result)
+	}
+
+	outerResult := fmt.Sprintf("\x1b[36m%s\x1b[0m", fmt.Sprintf("before %s after", result))
+	expectedNested := "\x1b[36mbefore \x1b]8;;" + link + "\x1b\\link\x1b]8;;\x1b\\ after\x1b[0m"
+
+	if outerResult != expectedNested {
+		t.Errorf("Nested hyperlink should preserve outer color.\nExpected: %q\nGot: %q", expectedNested, outerResult)
 	}
 }

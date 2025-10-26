@@ -44,6 +44,7 @@ func noColorIsSet() bool {
 type Color struct {
 	params  []Attribute
 	noColor *bool
+	link    string
 }
 
 // Attribute defines a single SGR Code
@@ -208,12 +209,13 @@ func (c *Color) Set() *Color {
 	return c
 }
 
-func (c *Color) unset() {
+func (c *Color) Unset() *Color {
 	if c.isNoColorSet() {
-		return
+		return c
 	}
 
-	Unset()
+	fmt.Fprint(Output, c.unformat())
+	return c
 }
 
 // SetWriter is used to set the SGR sequence with the given io.Writer. This is
@@ -235,7 +237,7 @@ func (c *Color) UnsetWriter(w io.Writer) {
 		return
 	}
 
-	fmt.Fprintf(w, "%s[%dm", escape, Reset)
+	fmt.Fprint(w, c.unformat())
 }
 
 // Add is used to chain SGR parameters. Use as many as parameters to combine
@@ -264,7 +266,7 @@ func (c *Color) Fprint(w io.Writer, a ...interface{}) (n int, err error) {
 // color.
 func (c *Color) Print(a ...interface{}) (n int, err error) {
 	c.Set()
-	defer c.unset()
+	defer c.Unset()
 
 	return fmt.Fprint(Output, a...)
 }
@@ -285,7 +287,7 @@ func (c *Color) Fprintf(w io.Writer, format string, a ...interface{}) (n int, er
 // This is the standard fmt.Printf() method wrapped with the given color.
 func (c *Color) Printf(format string, a ...interface{}) (n int, err error) {
 	c.Set()
-	defer c.unset()
+	defer c.Unset()
 
 	return fmt.Fprintf(Output, format, a...)
 }
@@ -411,8 +413,8 @@ func (c *Color) sequence() string {
 	return strings.Join(format, ";")
 }
 
-// wrap wraps the s string with the colors attributes. The string is ready to
-// be printed.
+// wrap wraps the s string with the colors attributes and link if specified.
+// The string is ready to be printed.
 func (c *Color) wrap(s string) string {
 	if c.isNoColorSet() {
 		return s
@@ -422,22 +424,42 @@ func (c *Color) wrap(s string) string {
 }
 
 func (c *Color) format() string {
-	return fmt.Sprintf("%s[%sm", escape, c.sequence())
+	var sgrStart string
+	if len(c.params) > 0 {
+		sgrStart = fmt.Sprintf("%s[%sm", escape, c.sequence())
+	}
+
+	if c.link != "" {
+		// OSC 8 start: ESC]8;;URL ESC\  (or ST for String Terminator)
+		oscStart := fmt.Sprintf("%s]8;;%s%s\\", escape, c.link, escape)
+		return oscStart + sgrStart
+	}
+
+	return sgrStart
 }
 
 func (c *Color) unformat() string {
-	//return fmt.Sprintf("%s[%dm", escape, Reset)
-	//for each element in sequence let's use the specific reset escape, or the generic one if not found
-	format := make([]string, len(c.params))
-	for i, v := range c.params {
-		format[i] = strconv.Itoa(int(Reset))
-		ra, ok := mapResetAttributes[v]
-		if ok {
-			format[i] = strconv.Itoa(int(ra))
+	var sgrReset string
+	if len(c.params) > 0 {
+		// for each element in sequence let's use the specific reset escape, or the generic one if not found
+		format := make([]string, len(c.params))
+		for i, v := range c.params {
+			format[i] = strconv.Itoa(int(Reset))
+			ra, ok := mapResetAttributes[v]
+			if ok {
+				format[i] = strconv.Itoa(int(ra))
+			}
 		}
+		sgrReset = fmt.Sprintf("%s[%sm", escape, strings.Join(format, ";"))
 	}
 
-	return fmt.Sprintf("%s[%sm", escape, strings.Join(format, ";"))
+	if c.link != "" {
+		// OSC 8 end: ESC]8;;ESC\ (or ST for String Terminator)
+		oscReset := fmt.Sprintf("%s]8;;%s\\", escape, escape)
+		return sgrReset + oscReset
+	}
+
+	return sgrReset
 }
 
 // DisableColor disables the color output. Useful to not change any existing
@@ -451,6 +473,15 @@ func (c *Color) DisableColor() {
 // DisableColor(). Otherwise, this method has no side effects.
 func (c *Color) EnableColor() {
 	c.noColor = boolPtr(false)
+}
+
+// Hyperlink wraps the output with OSC hyperlink escape codes.
+// It takes a URL and applies it to the color object.
+// When printed, it wraps the colored text with the hyperlink escape sequence.
+// Returns the color for chaining.
+func (c *Color) Hyperlink(url string) *Color {
+	c.link = url
+	return c
 }
 
 func (c *Color) isNoColorSet() bool {
