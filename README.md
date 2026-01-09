@@ -121,6 +121,38 @@ fmt.Printf("%v %v\n", color.GreenString("Info:"), "an important message.")
 fmt.Fprintf(color.Output, "Windows support: %s", color.GreenString("PASS"))
 ```
 
+### text/tabwriter compatibility
+
+The standard library `text/tabwriter` counts ANSI escape sequences as visible
+characters, so colored strings will break column alignment. For aligned output
+with colors, use the ANSI-aware tabwriter in this module, or disable colors for
+that output.
+
+ANSI-aware replacement:
+
+- `github.com/fatih/color/tabwriter`
+
+```go
+import (
+	"os"
+
+	ctabwriter "github.com/fatih/color/tabwriter"
+	"github.com/fatih/color"
+)
+
+w := ctabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+defer w.Flush()
+
+fmt.Fprintln(w, "Status\tMessage")
+fmt.Fprintf(w, "%s\t%s\n", color.RedString("Fail"), "something went wrong")
+```
+
+If you must use `text/tabwriter`, disable color output for the tabular section:
+
+```go
+color.NoColor = true
+```
+
 ### Plug into existing code
 
 ```go

@@ -87,6 +87,11 @@ set the output to color.Output:
 	info := New(FgWhite, BgGreen).SprintFunc()
 	fmt.Fprintf(color.Output, "this %s rocks!\n", info("package"))
 
+The standard library text/tabwriter counts ANSI escape sequences as visible
+characters, so colored strings will break column alignment. For aligned output
+with colors, use the ANSI-aware tabwriter in github.com/fatih/color/tabwriter,
+or disable colors for those tables.
+
 Using with existing code is possible. Just use the Set() method to set the
 standard output to the given parameters. That way a rewrite of an existing
 code is not required.
