@@ -1,6 +1,7 @@
 package color
 
 import (
+	"strings"
 	"bytes"
 	"fmt"
 	"io"
@@ -506,7 +507,9 @@ func TestIssue206_2(t *testing.T) {
 }
 
 func TestIssue218(t *testing.T) {
-	// Adds a newline to the end of the last string to make sure it isn't trimmed.
+	// Adds a newline to the end of the last string.
+	// With the fix for issue #241, trailing newlines are normalized
+	// to prevent double newlines in Println output.
 	params := []interface{}{"word1", "word2", "word3", "word4\n"}
 
 	c := New(FgCyan)
@@ -516,7 +519,7 @@ func TestIssue218(t *testing.T) {
 	fmt.Println(params...)
 	fmt.Print(result)
 
-	const expectedResult = "\x1b[36mword1 word2 word3 word4\n\x1b[0m\n"
+	const expectedResult = "\x1b[36mword1 word2 word3 word4\x1b[0m\n"
 
 	if !bytes.Equal([]byte(result), []byte(expectedResult)) {
 		t.Errorf("Sprintln: Expecting %v (%v), got '%v (%v)'\n", expectedResult, []byte(expectedResult), result, []byte(result))
@@ -552,4 +555,79 @@ func TestRGB(t *testing.T) {
 			BgRGB(tt.r, tt.g, tt.b).AddRGB(255, 255, 255).Println("with foreground")
 		})
 	}
+}
+
+// TestTrailingNewline tests that Println and Sprintln properly handle
+// strings that already contain trailing newlines (issue #241).
+func TestTrailingNewline(t *testing.T) {
+	c := New(FgRed)
+	
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "single trailing newline",
+			input:    "Hello\n",
+			expected: "Hello\n",
+		},
+		{
+			name:     "multiple trailing newlines",
+			input:    "World\n\n\n",
+			expected: "World\n",
+		},
+		{
+			name:     "no trailing newline",
+			input:    "Test",
+			expected: "Test\n",
+		},
+		{
+			name:     "newline in middle",
+			input:    "Line1\nLine2",
+			expected: "Line1\nLine2\n",
+		},
+	}
+	
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Test Sprintln
+			result := c.Sprintln(tt.input)
+			// Strip color codes for comparison
+			stripped := stripAnsi(result)
+			if stripped != tt.expected {
+				t.Errorf("Sprintln(%q) = %q, want %q", tt.input, stripped, tt.expected)
+			}
+			
+			// Test SprintlnFunc
+			sprintlnFunc := c.SprintlnFunc()
+			result2 := sprintlnFunc(tt.input)
+			stripped2 := stripAnsi(result2)
+			if stripped2 != tt.expected {
+				t.Errorf("SprintlnFunc()(%q) = %q, want %q", tt.input, stripped2, tt.expected)
+			}
+		})
+	}
+}
+
+// stripAnsi removes ANSI color codes from a string for testing
+func stripAnsi(s string) string {
+	// Simple implementation to strip escape sequences
+	var result strings.Builder
+	inEscape := false
+	for i := 0; i < len(s); i++ {
+		if s[i] == '\x1b' && i+1 < len(s) && s[i+1] == '[' {
+			inEscape = true
+			i++ // skip '['
+			continue
+		}
+		if inEscape {
+			if s[i] == 'm' {
+				inEscape = false
+			}
+			continue
+		}
+		result.WriteByte(s[i])
+	}
+	return result.String()
 }

@@ -677,5 +677,8 @@ func HiWhiteString(format string, a ...interface{}) string {
 
 // sprintln is a helper function to format a string with fmt.Sprintln and trim the trailing newline.
 func sprintln(a ...interface{}) string {
-	return strings.TrimSuffix(fmt.Sprintln(a...), "\n")
+	// Format with Sprintln, then trim all trailing newlines.
+	// This ensures Println/Sprintln always add exactly one newline,
+	// even if the input already contains trailing newlines.
+	return strings.TrimRight(fmt.Sprintln(a...), "\n")
 }
