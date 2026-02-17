@@ -612,3 +612,98 @@ func TestRGB(t *testing.T) {
 		})
 	}
 }
+
+func Test_forceColorIsSet(t *testing.T) {
+	tests := []struct {
+		name string
+		act  func()
+		want bool
+	}{
+		{
+			name: "default",
+			act:  func() {},
+			want: false,
+		},
+		{
+			name: "FORCE_COLOR=1",
+			act:  func() { os.Setenv("FORCE_COLOR", "1") },
+			want: true,
+		},
+		{
+			name: "FORCE_COLOR=0",
+			act:  func() { os.Setenv("FORCE_COLOR", "0") },
+			want: false,
+		},
+		{
+			name: "FORCE_COLOR=true",
+			act:  func() { os.Setenv("FORCE_COLOR", "true") },
+			want: true,
+		},
+		{
+			name: "FORCE_COLOR=",
+			act:  func() { os.Setenv("FORCE_COLOR", "") },
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Cleanup(func() {
+				os.Unsetenv("FORCE_COLOR")
+			})
+			tt.act()
+			if got := forceColorIsSet(); got != tt.want {
+				t.Errorf("forceColorIsSet() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestForceColor(t *testing.T) {
+	rb := new(bytes.Buffer)
+	Output = rb
+
+	os.Setenv("FORCE_COLOR", "1")
+	t.Cleanup(func() {
+		os.Unsetenv("FORCE_COLOR")
+	})
+
+	NoColor = false
+
+	testColors := []struct {
+		text string
+		code Attribute
+	}{
+		{text: "black", code: FgBlack},
+		{text: "red", code: FgRed},
+		{text: "green", code: FgGreen},
+	}
+
+	for _, c := range testColors {
+		p := New(c.code)
+		p.Print(c.text)
+
+		line, _ := rb.ReadString('\n')
+		scannedLine := fmt.Sprintf("%q", line)
+		colored := fmt.Sprintf("\x1b[%dm%s\x1b[0m", c.code, c.text)
+		escapedForm := fmt.Sprintf("%q", colored)
+
+		if scannedLine != escapedForm {
+			t.Errorf("Expecting %s, got '%s'\n", escapedForm, scannedLine)
+		}
+	}
+}
+
+func TestForceColorOverriddenByNoColor(t *testing.T) {
+	// NO_COLOR should take precedence over FORCE_COLOR
+	os.Setenv("FORCE_COLOR", "1")
+	os.Setenv("NO_COLOR", "1")
+	t.Cleanup(func() {
+		os.Unsetenv("FORCE_COLOR")
+		os.Unsetenv("NO_COLOR")
+	})
+
+	c := New(FgRed)
+	if !c.isNoColorSet() {
+		t.Error("Expected NO_COLOR to take precedence over FORCE_COLOR")
+	}
+}
