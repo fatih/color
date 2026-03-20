@@ -236,6 +236,42 @@ func Test_noColorIsSet(t *testing.T) {
 	}
 }
 
+func TestStdoutIsTerminal_NilStdout(t *testing.T) {
+	stdout := os.Stdout
+	os.Stdout = nil
+	t.Cleanup(func() {
+		os.Stdout = stdout
+	})
+
+	if stdoutIsTerminal() {
+		t.Fatal("stdoutIsTerminal() = true, want false")
+	}
+}
+
+func TestStdOut_NilStdout(t *testing.T) {
+	stdout := os.Stdout
+	os.Stdout = nil
+	t.Cleanup(func() {
+		os.Stdout = stdout
+	})
+
+	if got := stdOut(); got != io.Discard {
+		t.Fatalf("stdOut() = %v, want %v", got, io.Discard)
+	}
+}
+
+func TestStdErr_NilStderr(t *testing.T) {
+	stderr := os.Stderr
+	os.Stderr = nil
+	t.Cleanup(func() {
+		os.Stderr = stderr
+	})
+
+	if got := stdErr(); got != io.Discard {
+		t.Fatalf("stdErr() = %v, want %v", got, io.Discard)
+	}
+}
+
 func TestColorVisual(t *testing.T) {
 	// First Visual Test
 	Output = colorable.NewColorableStdout()
