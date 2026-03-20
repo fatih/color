@@ -22,11 +22,12 @@ var (
 	NoColor = noColorIsSet() || os.Getenv("TERM") == "dumb" || !stdoutIsTerminal()
 
 	// Output defines the standard output of the print functions. By default,
-	// os.Stdout is used.
-	Output = initOutput()
+	// stdOut() is used.
+	Output = stdOut()
 
-	// Error defines a color supporting writer for os.Stderr.
-	Error = initError()
+	// Error defines the standard error of the print functions. By default,
+	// stdErr() is used.
+	Error = stdErr()
 
 	// colorsCache is used to reduce the count of created Color objects and
 	// allows to reuse already created objects with required Attribute.
@@ -48,18 +49,18 @@ func stdoutIsTerminal() bool {
 	return isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd())
 }
 
-// initOutput returns a writer for color output.
+// stdOut returns a writer for color output.
 // Returns io.Discard if os.Stdout is nil (e.g., when running as a Windows service).
-func initOutput() io.Writer {
+func stdOut() io.Writer {
 	if os.Stdout == nil {
 		return io.Discard
 	}
 	return colorable.NewColorableStdout()
 }
 
-// initError returns a writer for color error output.
+// stdErr returns a writer for color error output.
 // Returns io.Discard if os.Stderr is nil (e.g., when running as a Windows service).
-func initError() io.Writer {
+func stdErr() io.Writer {
 	if os.Stderr == nil {
 		return io.Discard
 	}
