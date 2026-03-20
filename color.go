@@ -526,27 +526,24 @@ func (c *Color) Equals(c2 *Color) bool {
 	if c == nil || c2 == nil {
 		return false
 	}
+
 	if len(c.params) != len(c2.params) {
 		return false
 	}
 
+	counts := make(map[Attribute]int, len(c.params))
 	for _, attr := range c.params {
-		if !c2.attrExists(attr) {
+		counts[attr]++
+	}
+
+	for _, attr := range c2.params {
+		if counts[attr] == 0 {
 			return false
 		}
+		counts[attr]--
 	}
 
 	return true
-}
-
-func (c *Color) attrExists(a Attribute) bool {
-	for _, attr := range c.params {
-		if attr == a {
-			return true
-		}
-	}
-
-	return false
 }
 
 func boolPtr(v bool) *bool {
