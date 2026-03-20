@@ -246,22 +246,30 @@ func (c *Color) unset() {
 // a low-level function, and users should use the higher-level functions, such
 // as color.Fprint, color.Print, etc.
 func (c *Color) SetWriter(w io.Writer) *Color {
+	_, _ = c.setWriter(w)
+	return c
+}
+
+func (c *Color) setWriter(w io.Writer) (int, error) {
 	if c.isNoColorSet() {
-		return c
+		return 0, nil
 	}
 
-	fmt.Fprint(w, c.format())
-	return c
+	return fmt.Fprint(w, c.format())
 }
 
 // UnsetWriter resets all escape attributes and clears the output with the give
 // io.Writer. Usually should be called after SetWriter().
 func (c *Color) UnsetWriter(w io.Writer) {
+	_, _ = c.unsetWriter(w)
+}
+
+func (c *Color) unsetWriter(w io.Writer) (int, error) {
 	if c.isNoColorSet() {
-		return
+		return 0, nil
 	}
 
-	fmt.Fprintf(w, "%s[%dm", escape, Reset)
+	return fmt.Fprintf(w, "%s[%dm", escape, Reset)
 }
 
 // Add is used to chain SGR parameters. Use as many as parameters to combine
@@ -277,10 +285,20 @@ func (c *Color) Add(value ...Attribute) *Color {
 // On Windows, users should wrap w with colorable.NewColorable() if w is of
 // type *os.File.
 func (c *Color) Fprint(w io.Writer, a ...interface{}) (n int, err error) {
-	c.SetWriter(w)
-	defer c.UnsetWriter(w)
+	n, err = c.setWriter(w)
+	if err != nil {
+		return n, err
+	}
 
-	return fmt.Fprint(w, a...)
+	nn, err := fmt.Fprint(w, a...)
+	n += nn
+	if err != nil {
+		return
+	}
+
+	nn, err = c.unsetWriter(w)
+	n += nn
+	return n, err
 }
 
 // Print formats using the default formats for its operands and writes to
@@ -300,10 +318,20 @@ func (c *Color) Print(a ...interface{}) (n int, err error) {
 // On Windows, users should wrap w with colorable.NewColorable() if w is of
 // type *os.File.
 func (c *Color) Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {
-	c.SetWriter(w)
-	defer c.UnsetWriter(w)
+	n, err = c.setWriter(w)
+	if err != nil {
+		return n, err
+	}
 
-	return fmt.Fprintf(w, format, a...)
+	nn, err := fmt.Fprintf(w, format, a...)
+	n += nn
+	if err != nil {
+		return
+	}
+
+	nn, err = c.unsetWriter(w)
+	n += nn
+	return n, err
 }
 
 // Printf formats according to a format specifier and writes to standard output.

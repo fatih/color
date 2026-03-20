@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/mattn/go-colorable"
@@ -443,6 +444,64 @@ func TestColor_Sprintln_Newline(t *testing.T) {
 
 	if want != got {
 		t.Errorf("Println newline error\n\nwant: %q\n got: %q", want, got)
+	}
+}
+
+func TestColor_Fprint(t *testing.T) {
+	rb := new(strings.Builder)
+	c := New(FgRed)
+
+	n, err := c.Fprint(rb, "foo", "bar")
+	if err != nil {
+		t.Errorf("Fprint error: %v", err)
+	}
+	got := rb.String()
+	want := "\x1b[31mfoobar\x1b[0m"
+
+	if want != got {
+		t.Errorf("Fprint error\n\nwant: %q\n got: %q", want, got)
+	}
+	if n != len(got) {
+		t.Errorf("Fprint byte count does not match actual bytes written\n\nwant: %d\n got: %d", len(got), n)
+	}
+}
+
+func TestColor_Fprintln(t *testing.T) {
+	rb := new(strings.Builder)
+	c := New(FgRed)
+
+	n, err := c.Fprintln(rb, "foo", "bar")
+	if err != nil {
+		t.Errorf("Fprint error: %v", err)
+	}
+	got := rb.String()
+	want := "\x1b[31mfoo bar\x1b[0m\n"
+
+	if want != got {
+		t.Errorf("Fprintln error\n\nwant: %q\n got: %q", want, got)
+	}
+	if n != len(got) {
+		t.Errorf("Fprintln byte count does not match actual bytes written\n\nwant: %d\n got: %d", len(got), n)
+	}
+}
+
+func TestColor_Fprintf(t *testing.T) {
+	rb := new(strings.Builder)
+	c := New(FgRed)
+
+	n, err := c.Fprintf(rb, "%-7s %-7s %5d\n", "hello", "world", 123)
+	if err != nil {
+		t.Errorf("Fprint error: %v", err)
+	}
+
+	want := "\x1b[31mhello   world     123\n\x1b[0m"
+
+	got := rb.String()
+	if want != got {
+		t.Errorf("Fprintf error\n\nwant: %q\n got: %q", want, got)
+	}
+	if n != len(got) {
+		t.Errorf("Fprintf byte count does not match actual bytes written\n\nwant: %d\n got: %d", len(got), n)
 	}
 }
 
