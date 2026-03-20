@@ -104,6 +104,20 @@ func TestColorEquals(t *testing.T) {
 	}
 }
 
+func TestColorEquals_DuplicateAttributes(t *testing.T) {
+	ordered := New(FgRed, Bold).Add(FgRed)
+	reordered := New(Bold, FgRed).Add(FgRed)
+	differentCounts := New(FgRed, Bold).Add(Bold)
+
+	if !ordered.Equals(reordered) {
+		t.Error("Colors with the same attributes in different orders are not equal")
+	}
+
+	if ordered.Equals(differentCounts) {
+		t.Error("Colors with different duplicate attribute counts are equal")
+	}
+}
+
 func TestNoColor(t *testing.T) {
 	rb := new(bytes.Buffer)
 	Output = rb
