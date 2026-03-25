@@ -662,3 +662,94 @@ func TestRGB(t *testing.T) {
 		})
 	}
 }
+
+func Test_forceColorIsSet(t *testing.T) {
+	t.Run("default", func(t *testing.T) {
+		if forceColorIsSet() {
+			t.Errorf("forceColorIsSet() = true, want false")
+		}
+	})
+
+	tests := []struct {
+		name  string
+		value string
+		want  bool
+	}{
+		{
+			name:  "FORCE_COLOR=1",
+			value: "1",
+			want:  true,
+		},
+		{
+			name:  "FORCE_COLOR=0",
+			value: "0",
+			want:  false,
+		},
+		{
+			name:  "FORCE_COLOR=true",
+			value: "true",
+			want:  true,
+		},
+		{
+			name:  "FORCE_COLOR=",
+			value: "",
+			want:  true,
+		},
+		{
+			name:  "FORCE_COLOR=whatever",
+			value: "whatever",
+			want:  true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Setenv("FORCE_COLOR", tt.value)
+			if got := forceColorIsSet(); got != tt.want {
+				t.Errorf("forceColorIsSet() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestForceColor(t *testing.T) {
+	rb := new(bytes.Buffer)
+	Output = rb
+
+	t.Setenv("FORCE_COLOR", "1")
+
+	NoColor = false
+
+	testColors := []struct {
+		text string
+		code Attribute
+	}{
+		{text: "black", code: FgBlack},
+		{text: "red", code: FgRed},
+		{text: "green", code: FgGreen},
+	}
+
+	for _, c := range testColors {
+		p := New(c.code)
+		p.Print(c.text)
+
+		line, _ := rb.ReadString('\n')
+		scannedLine := fmt.Sprintf("%q", line)
+		colored := fmt.Sprintf("\x1b[%dm%s\x1b[0m", c.code, c.text)
+		escapedForm := fmt.Sprintf("%q", colored)
+
+		if scannedLine != escapedForm {
+			t.Errorf("Expecting %s, got '%s'\n", escapedForm, scannedLine)
+		}
+	}
+}
+
+func TestForceColorOverriddenByNoColor(t *testing.T) {
+	// NO_COLOR should take precedence over FORCE_COLOR
+	t.Setenv("FORCE_COLOR", "1")
+	t.Setenv("NO_COLOR", "1")
+
+	c := New(FgRed)
+	if !c.isNoColorSet() {
+		t.Error("Expected NO_COLOR to take precedence over FORCE_COLOR")
+	}
+}
