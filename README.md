@@ -139,7 +139,26 @@ defer color.Unset() // Use it in your function
 fmt.Println("All text will now be bold magenta.")
 ```
 
-### Disable/Enable color
+### Format strings and `Sprintf`
+
+`RedString`, `GreenString`, and other `*String` helpers accept a format string and
+arguments, like `fmt.Sprintf`. Pass the format and values directly:
+
+```go
+color.RedString("- DELETE %s", name)
+```
+
+Do **not** wrap the message in `fmt.Sprintf` first:
+
+```go
+// Anti-pattern: user-controlled values can break formatting or cause errors
+color.RedString(fmt.Sprintf("- DELETE %s", name))
+```
+
+If untrusted input contains `%`, the outer call may interpret it as a verb. Prefer
+the variadic helpers above; use `Red`/`Printf` when you need explicit `io.Writer` control.
+
+## Disable/Enable color
 
 There might be a case where you want to explicitly disable/enable color output. the 
 `go-isatty` package will automatically disable color output for non-tty output streams 
