@@ -19,7 +19,11 @@ var (
 	// set (regardless of its value). This is a global option and affects all
 	// colors. For more control over each color block use the methods
 	// DisableColor() individually.
-	NoColor = noColorIsSet() || os.Getenv("TERM") == "dumb" || !stdoutIsTerminal()
+	//
+	// If the FORCE_COLOR environment variable is set (to any value other than
+	// "0"), colors will be enabled regardless of terminal detection. NO_COLOR
+	// takes precedence over FORCE_COLOR.
+	NoColor = noColorIsSet() || (!forceColorIsSet() && (os.Getenv("TERM") == "dumb" || !stdoutIsTerminal()))
 
 	// Output defines the standard output of the print functions. By default,
 	// stdOut() is used.
@@ -65,6 +69,13 @@ func stdErr() io.Writer {
 		return io.Discard
 	}
 	return colorable.NewColorableStderr()
+}
+
+// forceColorIsSet returns true if the environment variable FORCE_COLOR is set
+// to a value other than "0". See https://force-color.org for more details.
+func forceColorIsSet() bool {
+	val, ok := os.LookupEnv("FORCE_COLOR")
+	return ok && val != "0"
 }
 
 // Color defines a custom color object which is defined by SGR parameters.
@@ -177,6 +188,9 @@ func New(value ...Attribute) *Color {
 
 	if noColorIsSet() {
 		c.noColor = boolPtr(true)
+	}
+	if forceColorIsSet() && !noColorIsSet() {
+		c.noColor = boolPtr(false)
 	}
 
 	c.Add(value...)
