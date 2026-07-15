@@ -113,6 +113,40 @@ var mapResetAttributes map[Attribute]Attribute = map[Attribute]Attribute{
 	ReverseVideo: ResetReversed,
 	Concealed:    ResetConcealed,
 	CrossedOut:   ResetCrossedOut,
+	FgBlack:      Attribute(39),
+	FgRed:        Attribute(39),
+	FgGreen:      Attribute(39),
+	FgYellow:     Attribute(39),
+	FgBlue:       Attribute(39),
+	FgMagenta:    Attribute(39),
+	FgCyan:       Attribute(39),
+	FgWhite:      Attribute(39),
+	FgHiBlack:    Attribute(39),
+	FgHiRed:      Attribute(39),
+	FgHiGreen:    Attribute(39),
+	FgHiYellow:   Attribute(39),
+	FgHiBlue:     Attribute(39),
+	FgHiMagenta:  Attribute(39),
+	FgHiCyan:     Attribute(39),
+	FgHiWhite:    Attribute(39),
+	BgBlack:      Attribute(49),
+	BgRed:        Attribute(49),
+	BgGreen:      Attribute(49),
+	BgYellow:     Attribute(49),
+	BgBlue:       Attribute(49),
+	BgMagenta:    Attribute(49),
+	BgCyan:       Attribute(49),
+	BgWhite:      Attribute(49),
+	BgHiBlack:    Attribute(49),
+	BgHiRed:      Attribute(49),
+	BgHiGreen:    Attribute(49),
+	BgHiYellow:   Attribute(49),
+	BgHiBlue:     Attribute(49),
+	BgHiMagenta:  Attribute(49),
+	BgHiCyan:     Attribute(49),
+	BgHiWhite:    Attribute(49),
+	foreground:   Attribute(39),
+	background:   Attribute(49),
 }
 
 // Foreground text colors
@@ -481,14 +515,12 @@ func (c *Color) format() string {
 }
 
 func (c *Color) unformat() string {
-	//return fmt.Sprintf("%s[%dm", escape, Reset)
-	//for each element in sequence let's use the specific reset escape, or the generic one if not found
-	format := make([]string, len(c.params))
-	for i, v := range c.params {
-		format[i] = strconv.Itoa(int(Reset))
+	//for each element in sequence let's use the specific reset escape, or skip if not found
+	format := make([]string, 0, len(c.params))
+	for _, v := range c.params {
 		ra, ok := mapResetAttributes[v]
 		if ok {
-			format[i] = strconv.Itoa(int(ra))
+			format = append(format, strconv.Itoa(int(ra)))
 		}
 	}
 
