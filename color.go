@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -224,6 +225,17 @@ func Unset() {
 
 	fmt.Fprintf(Output, "%s[%dm", escape, Reset)
 }
+
+// RemoveColor strips ANSI SGR color/attribute sequences from s and returns
+// the plain text. Useful when colored strings are later measured or written
+// to non-TTY sinks (for example text/tabwriter) (#271).
+func RemoveColor(s string) string {
+	return reANSI.ReplaceAllString(s, "")
+}
+
+// reANSI matches CSI sequences used for SGR colors/attributes, including
+// 8/24-bit color forms produced by this package.
+var reANSI = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
 // Set sets the SGR sequence.
 func (c *Color) Set() *Color {

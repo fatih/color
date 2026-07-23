@@ -662,3 +662,13 @@ func TestRGB(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveColor(t *testing.T) {
+	colored := New(FgRed).Sprint("hello")
+	if RemoveColor(colored) != "hello" {
+		t.Fatalf("got %q", RemoveColor(colored))
+	}
+	if RemoveColor("plain") != "plain" {
+		t.Fatal("plain text changed")
+	}
+}
