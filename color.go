@@ -1,6 +1,7 @@
 package color
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -286,6 +287,12 @@ func (c *Color) Add(value ...Attribute) *Color {
 // On Windows, users should wrap w with colorable.NewColorable() if w is of
 // type *os.File.
 func (c *Color) Fprint(w io.Writer, a ...interface{}) (n int, err error) {
+	if w == nil {
+		return 0, errors.New("color: nil Writer")
+	}
+	if c == nil {
+		return fmt.Fprint(w, a...)
+	}
 	n, err = c.setWriter(w)
 	if err != nil {
 		return n, err
@@ -319,6 +326,12 @@ func (c *Color) Print(a ...interface{}) (n int, err error) {
 // On Windows, users should wrap w with colorable.NewColorable() if w is of
 // type *os.File.
 func (c *Color) Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {
+	if w == nil {
+		return 0, errors.New("color: nil Writer")
+	}
+	if c == nil {
+		return fmt.Fprintf(w, format, a...)
+	}
 	n, err = c.setWriter(w)
 	if err != nil {
 		return n, err
@@ -350,6 +363,12 @@ func (c *Color) Printf(format string, a ...interface{}) (n int, err error) {
 // On Windows, users should wrap w with colorable.NewColorable() if w is of
 // type *os.File.
 func (c *Color) Fprintln(w io.Writer, a ...interface{}) (n int, err error) {
+	if w == nil {
+		return 0, errors.New("color: nil Writer")
+	}
+	if c == nil {
+		return fmt.Fprintln(w, sprintln(a...))
+	}
 	return fmt.Fprintln(w, c.wrap(sprintln(a...)))
 }
 
@@ -469,7 +488,7 @@ func (c *Color) sequence() string {
 // wrap wraps the s string with the colors attributes. The string is ready to
 // be printed.
 func (c *Color) wrap(s string) string {
-	if c.isNoColorSet() {
+	if c == nil || c.isNoColorSet() {
 		return s
 	}
 
@@ -499,16 +518,25 @@ func (c *Color) unformat() string {
 // code and still being able to output. Can be used for flags like
 // "--no-color". To enable back use EnableColor() method.
 func (c *Color) DisableColor() {
+	if c == nil {
+		return
+	}
 	c.noColor = boolPtr(true)
 }
 
 // EnableColor enables the color output. Use it in conjunction with
 // DisableColor(). Otherwise, this method has no side effects.
 func (c *Color) EnableColor() {
+	if c == nil {
+		return
+	}
 	c.noColor = boolPtr(false)
 }
 
 func (c *Color) isNoColorSet() bool {
+	if c == nil {
+		return true
+	}
 	// check first if we have user set action
 	if c.noColor != nil {
 		return *c.noColor
