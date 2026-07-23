@@ -662,3 +662,29 @@ func TestRGB(t *testing.T) {
 		})
 	}
 }
+
+func TestEqualsAndClampRGB(t *testing.T) {
+	a := New(FgRed, Bold)
+	b := New(FgRed, Bold)
+	c := New(FgBlue)
+	if !a.Equals(b) {
+		t.Fatal("expected equal")
+	}
+	if a.Equals(c) {
+		t.Fatal("expected not equal")
+	}
+	if a.Equals(nil) || (*Color)(nil).Equals(a) {
+		t.Fatal("nil compare")
+	}
+	if !(*Color)(nil).Equals(nil) {
+		t.Fatal("nil equals nil")
+	}
+	rgb := New().AddRGB(300, -5, 128)
+	// params: foreground, 2, r, g, b
+	if len(rgb.params) < 5 {
+		t.Fatalf("params %v", rgb.params)
+	}
+	if rgb.params[2] != 255 || rgb.params[3] != 0 || rgb.params[4] != 128 {
+		t.Fatalf("clamp failed: %v", rgb.params)
+	}
+}

@@ -196,14 +196,14 @@ func BgRGB(r, g, b int) *Color {
 // AddRGB is used to chain foreground RGB SGR parameters. Use as many as parameters to combine
 // and create custom color objects. Example: .Add(34, 0, 12).Add(255, 128, 0).
 func (c *Color) AddRGB(r, g, b int) *Color {
-	c.params = append(c.params, foreground, 2, Attribute(r), Attribute(g), Attribute(b))
+	c.params = append(c.params, foreground, 2, Attribute(clampRGB(r)), Attribute(clampRGB(g)), Attribute(clampRGB(b)))
 	return c
 }
 
 // AddRGB is used to chain background RGB SGR parameters. Use as many as parameters to combine
 // and create custom color objects. Example: .Add(34, 0, 12).Add(255, 128, 0).
 func (c *Color) AddBgRGB(r, g, b int) *Color {
-	c.params = append(c.params, background, 2, Attribute(r), Attribute(g), Attribute(b))
+	c.params = append(c.params, background, 2, Attribute(clampRGB(r)), Attribute(clampRGB(g)), Attribute(clampRGB(b)))
 	return c
 }
 
@@ -730,4 +730,15 @@ func HiWhiteString(format string, a ...interface{}) string {
 // sprintln is a helper function to format a string with fmt.Sprintln and trim the trailing newline.
 func sprintln(a ...interface{}) string {
 	return strings.TrimSuffix(fmt.Sprintln(a...), "\n")
+}
+
+// clampRGB limits a color channel to the 0–255 range used by SGR RGB sequences.
+func clampRGB(v int) int {
+	if v < 0 {
+		return 0
+	}
+	if v > 255 {
+		return 255
+	}
+	return v
 }
