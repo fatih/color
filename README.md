@@ -148,6 +148,12 @@ There might be a case where you want to explicitly disable/enable color output. 
 The `color` package also disables color output if the [`NO_COLOR`](https://no-color.org) environment
 variable is set to a non-empty string.
 
+It also supports the [`FORCE_COLOR`](https://force-color.org) environment variable. When
+`FORCE_COLOR` is set (to any value other than `"0"`), colors will be enabled regardless of
+terminal detection. This is useful in CI environments like GitHub Actions and GitLab CI that
+support ANSI colors but are not detected as TTYs. `NO_COLOR` takes precedence over
+`FORCE_COLOR`.
+
 `Color` has support to disable/enable colors programmatically both globally and
 for single color definitions. For example suppose you have a CLI app and a
 `-no-color` bool flag. You can easily disable the color output with:
@@ -176,7 +182,9 @@ c.Println("This prints again cyan...")
 
 ## GitHub Actions
 
-To output color in GitHub Actions (or other CI systems that support ANSI colors), make sure to set `color.NoColor = false` so that it bypasses the check for non-tty output streams. 
+To output color in GitHub Actions (or other CI systems that support ANSI colors), you can
+set the `FORCE_COLOR=1` environment variable. Alternatively, set `color.NoColor = false`
+programmatically to bypass the check for non-tty output streams.
 
 
 ## Credits
