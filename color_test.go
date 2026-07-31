@@ -24,6 +24,7 @@ func TestColor(t *testing.T) {
 		text string
 		code Attribute
 	}{
+		{text: "default", code: FgDefault},
 		{text: "black", code: FgBlack},
 		{text: "red", code: FgRed},
 		{text: "green", code: FgGreen},
