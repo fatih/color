@@ -662,3 +662,19 @@ func TestRGB(t *testing.T) {
 		})
 	}
 }
+
+func TestRGBOutput(t *testing.T) {
+	NoColor = false
+
+	out := RGB(255, 128, 0).Sprint("orange")
+	expected := "\x1b[38;2;255;128;0morange\x1b[0;22;0;0;0m"
+	if out != expected {
+		t.Errorf("RGB.Sprint: Expecting %q, got %q", expected, out)
+	}
+
+	outBg := BgRGB(0, 128, 255).Sprint("blue")
+	expectedBg := "\x1b[48;2;0;128;255mblue\x1b[0;22;0;0;0m"
+	if outBg != expectedBg {
+		t.Errorf("BgRGB.Sprint: Expecting %q, got %q", expectedBg, outBg)
+	}
+}
