@@ -1,6 +1,6 @@
 /*
 Package color is an ANSI color package to output colorized or SGR defined
-output to the standard output. The API can be used in several way, pick one
+output to the standard output. The API can be used in several ways, pick one
 that suits you.
 
 Use simple and default helper functions with predefined foreground colors:
@@ -50,7 +50,7 @@ separate color object.
 
 You can create PrintXxx functions to simplify even more:
 
-	// Create a custom print function for convenient
+	// Create a custom print function for convenience
 	red := color.New(color.FgRed).PrintfFunc()
 	red("warning")
 	red("error: %s", err)
@@ -59,14 +59,14 @@ You can create PrintXxx functions to simplify even more:
 	notice := color.New(color.Bold, color.FgGreen).PrintlnFunc()
 	notice("don't forget this...")
 
-You can also FprintXxx functions to pass your own io.Writer:
+You can also create FprintXxx functions to pass your own io.Writer:
 
 	blue := color.New(FgBlue).FprintfFunc()
 	blue(myWriter, "important notice: %s", stars)
 
 	// Mix up with multiple attributes
 	success := color.New(color.Bold, color.FgGreen).FprintlnFunc()
-	success(myWriter, don't forget this...")
+	success(myWriter, "don't forget this...")
 
 Or create SprintXxx functions to mix strings with other non-colorized strings:
 
@@ -79,7 +79,7 @@ Or create SprintXxx functions to mix strings with other non-colorized strings:
 	fmt.Printf("this %s rocks!\n", info("package"))
 
 Windows support is enabled by default. All Print functions work as intended.
-However, only for color.SprintXXX functions, user should use fmt.FprintXXX and
+However, only for color.SprintXXX functions, users should use fmt.FprintXXX and
 set the output to color.Output:
 
 	fmt.Fprintf(color.Output, "Windows support: %s", color.GreenString("PASS"))
@@ -88,7 +88,7 @@ set the output to color.Output:
 	fmt.Fprintf(color.Output, "this %s rocks!\n", info("package"))
 
 Using with existing code is possible. Just use the Set() method to set the
-standard output to the given parameters. That way a rewrite of an existing
+standard output to the given parameters. That way a rewrite of existing
 code is not required.
 
 	// Use handy standard colors.

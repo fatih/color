@@ -662,3 +662,20 @@ func TestRGB(t *testing.T) {
 		})
 	}
 }
+
+func TestColor_Funcs(t *testing.T) {
+	c := New(FgGreen)
+	sprint := c.SprintFunc()
+	out := sprint("test")
+	if !strings.Contains(out, "test") {
+		t.Errorf("SprintFunc() = %q, want containing 'test'", out)
+	}
+
+	var buf bytes.Buffer
+	fprint := c.FprintfFunc()
+	fprint(&buf, "hello %s", "world")
+	if !strings.Contains(buf.String(), "hello world") {
+		t.Errorf("FprintfFunc() = %q, want containing 'hello world'", buf.String())
+	}
+}
+
