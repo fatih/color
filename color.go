@@ -200,7 +200,7 @@ func (c *Color) AddRGB(r, g, b int) *Color {
 	return c
 }
 
-// AddRGB is used to chain background RGB SGR parameters. Use as many as parameters to combine
+// AddBgRGB is used to chain background RGB SGR parameters. Use as many as parameters to combine
 // and create custom color objects. Example: .Add(34, 0, 12).Add(255, 128, 0).
 func (c *Color) AddBgRGB(r, g, b int) *Color {
 	c.params = append(c.params, background, 2, Attribute(r), Attribute(g), Attribute(b))
@@ -482,7 +482,7 @@ func (c *Color) format() string {
 
 func (c *Color) unformat() string {
 	//return fmt.Sprintf("%s[%dm", escape, Reset)
-	//for each element in sequence let's use the specific reset escape, or the generic one if not found
+	//for each element in sequence, let's use the specific reset escape, or the generic one if not found
 	format := make([]string, len(c.params))
 	for i, v := range c.params {
 		format[i] = strconv.Itoa(int(Reset))
@@ -497,7 +497,7 @@ func (c *Color) unformat() string {
 
 // DisableColor disables the color output. Useful to not change any existing
 // code and still being able to output. Can be used for flags like
-// "--no-color". To enable back use EnableColor() method.
+// "--no-color". To enable back, use the EnableColor() method.
 func (c *Color) DisableColor() {
 	c.noColor = boolPtr(true)
 }
@@ -514,7 +514,7 @@ func (c *Color) isNoColorSet() bool {
 		return *c.noColor
 	}
 
-	// if not return the global option, which is disabled by default
+	// if not, return the global option, which is disabled by default
 	return NoColor
 }
 
