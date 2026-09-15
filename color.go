@@ -235,14 +235,6 @@ func (c *Color) Set() *Color {
 	return c
 }
 
-func (c *Color) unset() {
-	if c.isNoColorSet() {
-		return
-	}
-
-	Unset()
-}
-
 // SetWriter is used to set the SGR sequence with the given io.Writer. This is
 // a low-level function, and users should use the higher-level functions, such
 // as color.Fprint, color.Print, etc.
@@ -308,10 +300,7 @@ func (c *Color) Fprint(w io.Writer, a ...interface{}) (n int, err error) {
 // encountered. This is the standard fmt.Print() method wrapped with the given
 // color.
 func (c *Color) Print(a ...interface{}) (n int, err error) {
-	c.Set()
-	defer c.unset()
-
-	return fmt.Fprint(Output, a...)
+	return c.Fprint(Output, a...)
 }
 
 // Fprintf formats according to a format specifier and writes to w.
@@ -339,10 +328,7 @@ func (c *Color) Fprintf(w io.Writer, format string, a ...interface{}) (n int, er
 // It returns the number of bytes written and any write error encountered.
 // This is the standard fmt.Printf() method wrapped with the given color.
 func (c *Color) Printf(format string, a ...interface{}) (n int, err error) {
-	c.Set()
-	defer c.unset()
-
-	return fmt.Fprintf(Output, format, a...)
+	return c.Fprintf(Output, format, a...)
 }
 
 // Fprintln formats using the default formats for its operands and writes to w.

@@ -2,6 +2,7 @@ package color
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -552,6 +553,87 @@ func TestColor_Fprintf(t *testing.T) {
 	}
 	if n != len(got) {
 		t.Errorf("Fprintf byte count does not match actual bytes written\n\nwant: %d\n got: %d", len(got), n)
+	}
+}
+
+func TestColor_Print(t *testing.T) {
+	rb := new(strings.Builder)
+	oldOutput := Output
+	Output = rb
+	t.Cleanup(func() { Output = oldOutput })
+	c := New(FgRed)
+	c.EnableColor()
+
+	n, err := c.Print("foo", "bar")
+	if err != nil {
+		t.Errorf("Print error: %v", err)
+	}
+	got := rb.String()
+	want := "\x1b[31mfoobar\x1b[0m"
+
+	if want != got {
+		t.Errorf("Print error\n\nwant: %q\n got: %q", want, got)
+	}
+	if n != len(got) {
+		t.Errorf("Print byte count does not match actual bytes written\n\nwant: %d\n got: %d", len(got), n)
+	}
+}
+
+func TestColor_Printf(t *testing.T) {
+	rb := new(strings.Builder)
+	oldOutput := Output
+	Output = rb
+	t.Cleanup(func() { Output = oldOutput })
+	c := New(FgRed)
+	c.EnableColor()
+
+	n, err := c.Printf("%s %d", "answer", 42)
+	if err != nil {
+		t.Errorf("Printf error: %v", err)
+	}
+	got := rb.String()
+	want := "\x1b[31manswer 42\x1b[0m"
+
+	if want != got {
+		t.Errorf("Printf error\n\nwant: %q\n got: %q", want, got)
+	}
+	if n != len(got) {
+		t.Errorf("Printf byte count does not match actual bytes written\n\nwant: %d\n got: %d", len(got), n)
+	}
+}
+
+type failFirstWriter struct {
+	err    error
+	writes int
+}
+
+func (w *failFirstWriter) Write(p []byte) (int, error) {
+	w.writes++
+	if w.writes == 1 {
+		return 0, w.err
+	}
+	return len(p), nil
+}
+
+func TestColor_PrintReturnsSetError(t *testing.T) {
+	wantErr := errors.New("set failed")
+	w := &failFirstWriter{err: wantErr}
+	oldOutput := Output
+	Output = w
+	t.Cleanup(func() { Output = oldOutput })
+	c := New(FgRed)
+	c.EnableColor()
+
+	n, err := c.Print("content")
+
+	if !errors.Is(err, wantErr) {
+		t.Errorf("Print error\n\nwant: %v\n got: %v", wantErr, err)
+	}
+	if n != 0 {
+		t.Errorf("Print byte count after set error\n\nwant: 0\n got: %d", n)
+	}
+	if w.writes != 1 {
+		t.Errorf("Print writes after set error\n\nwant: 1\n got: %d", w.writes)
 	}
 }
 
