@@ -240,7 +240,10 @@ func (c *Color) unset() {
 		return
 	}
 
-	Unset()
+	// Write the reset ourselves. Unset() consults the global NoColor flag,
+	// which would skip the closer when this Color was EnableColor()'d while
+	// the process-wide autodetection is off (issue #230).
+	fmt.Fprintf(Output, "%s[%dm", escape, Reset)
 }
 
 // SetWriter is used to set the SGR sequence with the given io.Writer. This is
