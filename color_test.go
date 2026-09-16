@@ -173,6 +173,36 @@ func TestNoColor(t *testing.T) {
 	}
 }
 
+func TestIssue230EnableColorClosesSGR(t *testing.T) {
+	rb := new(bytes.Buffer)
+	prevOut, prevNo := Output, NoColor
+	t.Cleanup(func() {
+		Output = prevOut
+		NoColor = prevNo
+	})
+	Output = rb
+	NoColor = true
+
+	c := New(FgRed)
+	c.EnableColor()
+	c.Print("x")
+	got := rb.String()
+	want := fmt.Sprintf("\x1b[%dmx\x1b[0m", FgRed)
+	if got != want {
+		t.Fatalf("Print with EnableColor under global NoColor: got %q want %q", got, want)
+	}
+
+	rb.Reset()
+	c.SetWriter(rb)
+	fmt.Fprint(rb, "y")
+	c.UnsetWriter(rb)
+	got = rb.String()
+	want = fmt.Sprintf("\x1b[%dmy\x1b[0m", FgRed)
+	if got != want {
+		t.Fatalf("SetWriter/UnsetWriter: got %q want %q", got, want)
+	}
+}
+
 func TestNoColor_Env(t *testing.T) {
 	rb := new(bytes.Buffer)
 	Output = rb
