@@ -262,6 +262,66 @@ func TestStdoutIsTerminal_NilStdout(t *testing.T) {
 	}
 }
 
+func TestStdoutIsTerminal_VSCode(t *testing.T) {
+	origTermProgram := os.Getenv("TERM_PROGRAM")
+	origVscodePid := os.Getenv("VSCODE_PID")
+	origStdout := os.Stdout
+	t.Cleanup(func() {
+		os.Stdout = origStdout
+		if origTermProgram != "" {
+			os.Setenv("TERM_PROGRAM", origTermProgram)
+		} else {
+			os.Unsetenv("TERM_PROGRAM")
+		}
+		if origVscodePid != "" {
+			os.Setenv("VSCODE_PID", origVscodePid)
+		} else {
+			os.Unsetenv("VSCODE_PID")
+		}
+	})
+
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatalf("os.Pipe() error: %v", err)
+	}
+	defer r.Close()
+	defer w.Close()
+
+	// When neither TERM_PROGRAM nor VSCODE_PID is set, pipe is not considered terminal.
+	os.Unsetenv("TERM_PROGRAM")
+	os.Unsetenv("VSCODE_PID")
+	os.Stdout = w
+	if stdoutIsTerminal() {
+		t.Error("stdoutIsTerminal() = true, want false for pipe when not in VSCode")
+	}
+
+	// When TERM_PROGRAM=vscode with pipe, stdoutIsTerminal should return true.
+	os.Setenv("TERM_PROGRAM", "vscode")
+	if !stdoutIsTerminal() {
+		t.Error("stdoutIsTerminal() = false, want true for VSCode pipe with TERM_PROGRAM=vscode")
+	}
+
+	// When VSCODE_PID is set with pipe, stdoutIsTerminal should return true.
+	os.Unsetenv("TERM_PROGRAM")
+	os.Setenv("VSCODE_PID", "12345")
+	if !stdoutIsTerminal() {
+		t.Error("stdoutIsTerminal() = false, want true for VSCode pipe with VSCODE_PID set")
+	}
+
+	// When stdout is a regular file in VSCode, stdoutIsTerminal should return false.
+	f, err := os.CreateTemp("", "color_test_stdout_*")
+	if err != nil {
+		t.Fatalf("os.CreateTemp() error: %v", err)
+	}
+	defer os.Remove(f.Name())
+	defer f.Close()
+
+	os.Stdout = f
+	if stdoutIsTerminal() {
+		t.Error("stdoutIsTerminal() = true, want false for regular file even in VSCode")
+	}
+}
+
 func TestStdOut_NilStdout(t *testing.T) {
 	stdout := os.Stdout
 	os.Stdout = nil
