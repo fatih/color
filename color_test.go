@@ -262,6 +262,54 @@ func TestStdoutIsTerminal_NilStdout(t *testing.T) {
 	}
 }
 
+func TestStdoutIsTerminal_VSCode(t *testing.T) {
+	termProgram := os.Getenv("TERM_PROGRAM")
+	stdout := os.Stdout
+	t.Cleanup(func() {
+		os.Stdout = stdout
+		if termProgram != "" {
+			os.Setenv("TERM_PROGRAM", termProgram)
+		} else {
+			os.Unsetenv("TERM_PROGRAM")
+		}
+	})
+
+	os.Setenv("TERM_PROGRAM", "vscode")
+
+	// When stdout is a pipe in VSCode, stdoutIsTerminal should return true.
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatalf("os.Pipe() error: %v", err)
+	}
+	defer r.Close()
+	defer w.Close()
+
+	os.Stdout = w
+	if !stdoutIsTerminal() {
+		t.Error("stdoutIsTerminal() = false, want true for VSCode pipe")
+	}
+
+	// When stdout is a regular file in VSCode, stdoutIsTerminal should return false.
+	f, err := os.CreateTemp("", "color_test_stdout_*")
+	if err != nil {
+		t.Fatalf("os.CreateTemp() error: %v", err)
+	}
+	defer os.Remove(f.Name())
+	defer f.Close()
+
+	os.Stdout = f
+	if stdoutIsTerminal() {
+		t.Error("stdoutIsTerminal() = true, want false for regular file in VSCode")
+	}
+
+	// When TERM_PROGRAM is not vscode, a pipe should return false.
+	os.Unsetenv("TERM_PROGRAM")
+	os.Stdout = w
+	if stdoutIsTerminal() {
+		t.Error("stdoutIsTerminal() = true, want false for pipe when not in VSCode")
+	}
+}
+
 func TestStdOut_NilStdout(t *testing.T) {
 	stdout := os.Stdout
 	os.Stdout = nil
