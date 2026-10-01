@@ -40,13 +40,21 @@ func noColorIsSet() bool {
 	return os.Getenv("NO_COLOR") != ""
 }
 
-// stdoutIsTerminal returns true if os.Stdout is a terminal.
+// stdoutIsTerminal returns true if os.Stdout is a terminal or a color-capable environment.
 // Returns false if os.Stdout is nil (e.g., when running as a Windows service).
 func stdoutIsTerminal() bool {
 	if os.Stdout == nil {
 		return false
 	}
-	return isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd())
+	if isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd()) {
+		return true
+	}
+	if os.Getenv("TERM_PROGRAM") == "vscode" {
+		if fi, err := os.Stdout.Stat(); err == nil && !fi.Mode().IsRegular() {
+			return true
+		}
+	}
+	return false
 }
 
 // stdOut returns a writer for color output.
