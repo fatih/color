@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -33,6 +34,9 @@ var (
 	// allows to reuse already created objects with required Attribute.
 	colorsCache   = make(map[Attribute]*Color)
 	colorsCacheMu sync.Mutex // protects colorsCache
+
+	// ansiPattern matches ANSI escape sequences including CSI and OSC codes.
+	ansiPattern = regexp.MustCompile(`[\x1b\x9b](?:\[[0-?]*[ -/]*[@-~]|\][^\x07\x1b]*?(?:\x07|\x1b\\)|[a-zA-Z0-9=><~]|(?:[()#%*+-./].))`)
 )
 
 // noColorIsSet returns true if the environment variable NO_COLOR is set to a non-empty string.
@@ -731,3 +735,12 @@ func HiWhiteString(format string, a ...interface{}) string {
 func sprintln(a ...interface{}) string {
 	return strings.TrimSuffix(fmt.Sprintln(a...), "\n")
 }
+
+// RemoveColor is a helper function to strip ANSI escape sequences from a string.
+func RemoveColor(s string) string {
+	if !strings.Contains(s, escape) && !strings.Contains(s, "\x9b") {
+		return s
+	}
+	return ansiPattern.ReplaceAllString(s, "")
+}
+

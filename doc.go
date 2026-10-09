@@ -130,5 +130,9 @@ disable/enable color output on the fly:
 
 	c.EnableColor()
 	c.Println("This prints again cyan...")
+
+To strip ANSI escape sequences from an existing string, use RemoveColor():
+
+	clean := color.RemoveColor(color.RedString("colored text"))
 */
 package color
