@@ -662,3 +662,223 @@ func TestRGB(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveColor(t *testing.T) {
+	origNoColor := NoColor
+	NoColor = false
+	defer func() {
+		NoColor = origNoColor
+	}()
+
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "empty string",
+			input:    "",
+			expected: "",
+		},
+		{
+			name:     "plain text without escape codes",
+			input:    "plain text without color",
+			expected: "plain text without color",
+		},
+		{
+			name:     "plain text with unicode characters",
+			input:    "Hello, 世界! Café مرحبا äöü Русский",
+			expected: "Hello, 世界! Café مرحبا äöü Русский",
+		},
+		{
+			name:     "plain text with whitespace and newlines",
+			input:    "Line 1\n\tLine 2\r\nLine 3   ",
+			expected: "Line 1\n\tLine 2\r\nLine 3   ",
+		},
+		{
+			name:     "single foreground color red",
+			input:    RedString("red text"),
+			expected: "red text",
+		},
+		{
+			name:     "single foreground color green",
+			input:    GreenString("green text"),
+			expected: "green text",
+		},
+		{
+			name:     "single foreground color yellow",
+			input:    YellowString("yellow text"),
+			expected: "yellow text",
+		},
+		{
+			name:     "single foreground color blue",
+			input:    BlueString("blue text"),
+			expected: "blue text",
+		},
+		{
+			name:     "single foreground color magenta",
+			input:    MagentaString("magenta text"),
+			expected: "magenta text",
+		},
+		{
+			name:     "single foreground color cyan",
+			input:    CyanString("cyan text"),
+			expected: "cyan text",
+		},
+		{
+			name:     "single foreground color white",
+			input:    WhiteString("white text"),
+			expected: "white text",
+		},
+		{
+			name:     "single foreground color black",
+			input:    BlackString("black text"),
+			expected: "black text",
+		},
+		{
+			name:     "hi-intensity foreground color red",
+			input:    HiRedString("hi-red text"),
+			expected: "hi-red text",
+		},
+		{
+			name:     "hi-intensity foreground color green",
+			input:    HiGreenString("hi-green text"),
+			expected: "hi-green text",
+		},
+		{
+			name:     "hi-intensity foreground color yellow",
+			input:    HiYellowString("hi-yellow text"),
+			expected: "hi-yellow text",
+		},
+		{
+			name:     "hi-intensity foreground color blue",
+			input:    HiBlueString("hi-blue text"),
+			expected: "hi-blue text",
+		},
+		{
+			name:     "hi-intensity foreground color magenta",
+			input:    HiMagentaString("hi-magenta text"),
+			expected: "hi-magenta text",
+		},
+		{
+			name:     "hi-intensity foreground color cyan",
+			input:    HiCyanString("hi-cyan text"),
+			expected: "hi-cyan text",
+		},
+		{
+			name:     "hi-intensity foreground color white",
+			input:    HiWhiteString("hi-white text"),
+			expected: "hi-white text",
+		},
+		{
+			name:     "hi-intensity foreground color black",
+			input:    HiBlackString("hi-black text"),
+			expected: "hi-black text",
+		},
+		{
+			name:     "background color",
+			input:    New(BgRed).Sprint("red background"),
+			expected: "red background",
+		},
+		{
+			name:     "hi-intensity background color",
+			input:    New(BgHiGreen).Sprint("hi-green background"),
+			expected: "hi-green background",
+		},
+		{
+			name:     "multiple attributes bold underline italic",
+			input:    New(Bold, Underline, Italic, FgRed).Sprint("bold underline italic red"),
+			expected: "bold underline italic red",
+		},
+		{
+			name:     "foreground and background combined",
+			input:    New(FgWhite, BgBlue).Sprint("white on blue"),
+			expected: "white on blue",
+		},
+		{
+			name:     "24-bit RGB foreground",
+			input:    RGB(255, 128, 0).Sprint("orange RGB"),
+			expected: "orange RGB",
+		},
+		{
+			name:     "24-bit RGB background",
+			input:    BgRGB(50, 100, 150).Sprint("RGB background"),
+			expected: "RGB background",
+		},
+		{
+			name:     "24-bit RGB foreground and background",
+			input:    RGB(255, 128, 0).AddBgRGB(0, 0, 0).Sprint("orange on black RGB"),
+			expected: "orange on black RGB",
+		},
+		{
+			name:     "multiple colored segments",
+			input:    fmt.Sprintf("%s and %s and %s", RedString("red"), GreenString("green"), BlueString("blue")),
+			expected: "red and green and blue",
+		},
+		{
+			name:     "nested colored strings",
+			input:    RedString("start %s end", BlueString("middle")),
+			expected: "start middle end",
+		},
+		{
+			name:     "unicode text with color",
+			input:    CyanString("こんにちは世界"),
+			expected: "こんにちは世界",
+		},
+		{
+			name:     "raw ANSI 256 color sequence",
+			input:    "\x1b[38;5;196m256-color text\x1b[0m",
+			expected: "256-color text",
+		},
+		{
+			name:     "raw ANSI SGR resets",
+			input:    "\x1b[0m\x1b[m\x1b[22;39mclean text\x1b[0m",
+			expected: "clean text",
+		},
+		{
+			name:     "raw ANSI cursor movement and clear codes",
+			input:    "\x1b[2Jcleared\x1b[Kline\x1b[1Aup\x1b[2Bdown",
+			expected: "clearedlineupdown",
+		},
+		{
+			name:     "raw ANSI mode and cursor state codes",
+			input:    "\x1b[?25hvisible\x1b[?25lhidden\x1b[ssaved\x1b[urestored",
+			expected: "visiblehiddensavedrestored",
+		},
+		{
+			name:     "raw ANSI OSC hyperlink with BEL terminator",
+			input:    "\x1b]8;;https://github.com\x07GitHub Link\x1b]8;;\x07",
+			expected: "GitHub Link",
+		},
+		{
+			name:     "raw ANSI OSC hyperlink with ST terminator",
+			input:    "\x1b]8;;https://github.com\x1b\\GitHub Link\x1b]8;;\x1b\\",
+			expected: "GitHub Link",
+		},
+		{
+			name:     "raw ANSI OSC window title",
+			input:    "\x1b]0;Window Title\x07terminal content",
+			expected: "terminal content",
+		},
+		{
+			name:     "raw ANSI charset selection sequence",
+			input:    "\x1b(Bstandard charset\x1b)0",
+			expected: "standard charset",
+		},
+		{
+			name:     "standalone escape sequences with no surrounding text",
+			input:    "\x1b[31m\x1b[0m",
+			expected: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := RemoveColor(tt.input)
+			if got != tt.expected {
+				t.Errorf("RemoveColor(%q) = %q, want %q", tt.input, got, tt.expected)
+			}
+		})
+	}
+}
+

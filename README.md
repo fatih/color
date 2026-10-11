@@ -174,6 +174,14 @@ c.EnableColor()
 c.Println("This prints again cyan...")
 ```
 
+### Remove color from string
+
+To strip ANSI escape sequences from an existing string, use `color.RemoveColor`:
+
+```go
+clean := color.RemoveColor(color.RedString("colored text"))
+```
+
 ## GitHub Actions
 
 To output color in GitHub Actions (or other CI systems that support ANSI colors), make sure to set `color.NoColor = false` so that it bypasses the check for non-tty output streams. 
