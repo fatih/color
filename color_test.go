@@ -119,6 +119,43 @@ func TestColorEquals_DuplicateAttributes(t *testing.T) {
 	}
 }
 
+func TestColorEquals_RGB(t *testing.T) {
+	c1 := RGB(255, 128, 0)
+	c2 := RGB(255, 128, 0)
+	c3 := RGB(0, 128, 255)
+	c4 := BgRGB(255, 128, 0)
+	c5 := RGB(128, 255, 0)
+
+	if !c1.Equals(c2) {
+		t.Error("Identical RGB colors are not equal")
+	}
+
+	if c1.Equals(c3) {
+		t.Error("Different RGB colors (permutations of R, G, B) should not be equal")
+	}
+
+	if c1.Equals(c4) {
+		t.Error("Foreground and background RGB colors should not be equal")
+	}
+
+	if c1.Equals(c5) {
+		t.Error("RGB(255, 128, 0) and RGB(128, 255, 0) should not be equal")
+	}
+
+	// Mixing with other attributes in different order
+	mixed1 := New(Bold).AddRGB(255, 128, 0)
+	mixed2 := RGB(255, 128, 0).Add(Bold)
+	mixed3 := New(Underline).AddRGB(255, 128, 0)
+
+	if !mixed1.Equals(mixed2) {
+		t.Error("Colors with same RGB and attributes in different order should be equal")
+	}
+
+	if mixed1.Equals(mixed3) {
+		t.Error("Colors with different attributes should not be equal")
+	}
+}
+
 func TestNoColor(t *testing.T) {
 	rb := new(bytes.Buffer)
 	Output = rb

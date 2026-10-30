@@ -194,14 +194,14 @@ func BgRGB(r, g, b int) *Color {
 }
 
 // AddRGB is used to chain foreground RGB SGR parameters. Use as many as parameters to combine
-// and create custom color objects. Example: .Add(34, 0, 12).Add(255, 128, 0).
+// and create custom color objects. Example: .AddRGB(34, 0, 12).AddRGB(255, 128, 0).
 func (c *Color) AddRGB(r, g, b int) *Color {
 	c.params = append(c.params, foreground, 2, Attribute(r), Attribute(g), Attribute(b))
 	return c
 }
 
-// AddRGB is used to chain background RGB SGR parameters. Use as many as parameters to combine
-// and create custom color objects. Example: .Add(34, 0, 12).Add(255, 128, 0).
+// AddBgRGB is used to chain background RGB SGR parameters. Use as many as parameters to combine
+// and create custom color objects. Example: .AddBgRGB(34, 0, 12).AddBgRGB(255, 128, 0).
 func (c *Color) AddBgRGB(r, g, b int) *Color {
 	c.params = append(c.params, background, 2, Attribute(r), Attribute(g), Attribute(b))
 	return c
@@ -518,6 +518,31 @@ func (c *Color) isNoColorSet() bool {
 	return NoColor
 }
 
+type colorComponent struct {
+	len  int
+	data [5]Attribute
+}
+
+func extractComponents(params []Attribute) []colorComponent {
+	comps := make([]colorComponent, 0, len(params))
+	for i := 0; i < len(params); {
+		if (params[i] == foreground || params[i] == background) && i+4 < len(params) && params[i+1] == 2 {
+			comps = append(comps, colorComponent{
+				len:  5,
+				data: [5]Attribute{params[i], params[i+1], params[i+2], params[i+3], params[i+4]},
+			})
+			i += 5
+		} else {
+			comps = append(comps, colorComponent{
+				len:  1,
+				data: [5]Attribute{params[i]},
+			})
+			i++
+		}
+	}
+	return comps
+}
+
 // Equals returns a boolean value indicating whether two colors are equal.
 func (c *Color) Equals(c2 *Color) bool {
 	if c == nil && c2 == nil {
@@ -531,16 +556,22 @@ func (c *Color) Equals(c2 *Color) bool {
 		return false
 	}
 
-	counts := make(map[Attribute]int, len(c.params))
-	for _, attr := range c.params {
-		counts[attr]++
+	cComps := extractComponents(c.params)
+	c2Comps := extractComponents(c2.params)
+	if len(cComps) != len(c2Comps) {
+		return false
 	}
 
-	for _, attr := range c2.params {
-		if counts[attr] == 0 {
+	counts := make(map[colorComponent]int, len(cComps))
+	for _, comp := range cComps {
+		counts[comp]++
+	}
+
+	for _, comp := range c2Comps {
+		if counts[comp] == 0 {
 			return false
 		}
-		counts[attr]--
+		counts[comp]--
 	}
 
 	return true
